@@ -15,55 +15,58 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Entity // to declare entity class - whose life cycle will be managed by Hibernate
-@Table(name = "users") // to specify table name
-/*
- * To override name of PK column to user_id name - inherited field name column -
- * col name
- */
+@Entity 
+@Table(name = "users")
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
-//lombok annotations
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString(exclude = { "password", "image" }, callSuper = true)
 
-public class User extends BaseEntity  {
+public class User extends BaseEntity {
 
 	@Column(name = "first_name", length = 30) // varchar(30)
 	private String firstName;
 	@Column(name = "last_name", length = 30)
 	private String lastName;
-	@Column(unique = true, length = 50) // add UNIQUE constraint
+	@Column(unique = true, length = 50)
 	private String email;
-	// not null constraint
+
 	@Column(nullable = false)
 	private String password;
-//	@Transient //skips from persistence (i.e column will not be created )
-//	private String confirmPassword;
-	// Date , Calendar , GregorainCalendar - older Java API - @Temporal
-	// no annotation required for modern java date times
+
 	private LocalDate dob;
 
-	@Enumerated(EnumType.STRING) // column type - varchar | Enum
+	@Enumerated(EnumType.STRING)
 	@Column(name = "user_role")
 	private UserRole userRole;
 	@Column(unique = true, length = 14)
 	private String phone;
-	@Lob // column type - for Mysql : longblob
-	private byte[] image;
+	@Column(name = "image_url", length = 500)
+	private String image;
 
-	public User(String firstName, String lastName, String email, String password, LocalDate dob,
-			String phone) {
+	@Column(name = "is_verified", nullable = false)
+	private boolean isVerified = false;
+
+	@Column(name = "is_deleted", nullable = false)
+	private boolean isDeleted = false;
+
+	@Column(name = "kyc_status", length = 20)
+	private String kycStatus;
+	@Column(name = "aadhaar_url", length = 500)
+	private String aadhaarUrl; // Only populated for CUSTOMER role
+ 
+	@Column(name = "licence_url", length = 500)
+	private String licenceUrl;
+
+	public User(String firstName, String lastName, String email, String password, LocalDate dob, String phone) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.password = password;
 		this.dob = dob;
-
 		this.phone = phone;
 	}
 
-	
 }
