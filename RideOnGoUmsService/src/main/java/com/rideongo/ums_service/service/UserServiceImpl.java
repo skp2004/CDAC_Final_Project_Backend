@@ -19,6 +19,7 @@ import com.rideongo.ums_service.dtos.ApiResponse;
 import com.rideongo.ums_service.dtos.AuthRequest;
 import com.rideongo.ums_service.dtos.AuthResp;
 import com.rideongo.ums_service.dtos.UserDTO;
+import com.rideongo.ums_service.dtos.UserProfileResponseDTO;
 import com.rideongo.ums_service.dtos.UserSignupRequest;
 import com.rideongo.ums_service.entities.User;
 import com.rideongo.ums_service.entities.UserRole;
@@ -223,5 +224,15 @@ public class UserServiceImpl implements UserService {
 			throw new IOException("Failed to upload profile image: " + e.getMessage());
 		}
 	}
+	
+	@Override
+	public UserProfileResponseDTO getLoggedInUserProfile(String email) {
+
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+		return modelMapper.map(user, UserProfileResponseDTO.class);
+	}
+
 
 }
