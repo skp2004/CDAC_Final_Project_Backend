@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -23,8 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.rideongo.ums_service.dtos.AdminSignupRequest;
 import com.rideongo.ums_service.dtos.AuthRequest;
 import com.rideongo.ums_service.dtos.UserDTO;
+import com.rideongo.ums_service.dtos.UserProfileResponseDTO;
 import com.rideongo.ums_service.dtos.UserSignupRequest;
 import com.rideongo.ums_service.entities.User;
+import com.rideongo.ums_service.security.JwtUtils;
 import com.rideongo.ums_service.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,6 +46,8 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
 
 	private final UserService userService;
+	private final JwtUtils jwtUtils;
+
 
 	@GetMapping
 	public ResponseEntity<?> renderUserList() {
@@ -128,5 +133,26 @@ public class UserController {
 		log.info("Admin signup request for email: {}", request.getEmail());
 		return ResponseEntity.status(HttpStatus.CREATED).body(userService.adminSignup(request, profileImage));
 	}
+	
+	@GetMapping("/me")
+	@Operation(description = "Get logged-in user profile from JWT token")
+	public ResponseEntity<UserProfileResponseDTO> getLoggedInUserProfile(
+			@RequestHeader("Authorization") String authHeader) {
 
+		// Extract token
+		String token = authHeader.substring(7); // remove "Bearer "
+
+		// Validate & parse token
+		String email = jwtUtils.validateToken(token).getSubject();
+
+		log.info("Logged in user email from JWT: {}", email);
+
+		return ResponseEntity.ok(
+				userService.getLoggedInUserProfile(email)
+		);
+	}
 }
+
+
+
+
