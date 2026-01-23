@@ -10,6 +10,7 @@ import com.rideongo.ums_service.dtos.ApiResponse;
 import com.rideongo.ums_service.dtos.AuthRequest;
 import com.rideongo.ums_service.dtos.AuthResp;
 import com.rideongo.ums_service.dtos.UserDTO;
+import com.rideongo.ums_service.dtos.UserProfileResponseDTO;
 import com.rideongo.ums_service.dtos.UserSignupRequest;
 import com.rideongo.ums_service.entities.User;
 
@@ -36,4 +37,6 @@ public interface UserService {
 	
 	ApiResponse adminSignup(AdminSignupRequest request, 
 	                        MultipartFile profileImage) throws IOException;
+	
+	UserProfileResponseDTO getLoggedInUserProfile(String email);
 }
