@@ -1,0 +1,46 @@
+package com.rideongo.bms_service.controller;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import com.rideongo.bms_service.dtos.LocationRequestDTO;
+import com.rideongo.bms_service.dtos.LocationResponseDTO;
+import com.rideongo.bms_service.service.LocationService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/locations")
+@RequiredArgsConstructor
+@Validated
+public class LocationController {
+
+	private final LocationService locationService;
+
+	@PostMapping
+	public ResponseEntity<LocationResponseDTO> addLocation(
+			@RequestBody @Valid LocationRequestDTO dto) {
+		return new ResponseEntity<>(locationService.addLocation(dto), HttpStatus.CREATED);
+	}
+
+	@GetMapping
+	public ResponseEntity<List<LocationResponseDTO>> getAllLocations() {
+		return ResponseEntity.ok(locationService.getAllLocations());
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<LocationResponseDTO> getLocation(@PathVariable Long id) {
+		return ResponseEntity.ok(locationService.getLocationById(id));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteLocation(@PathVariable Long id) {
+		locationService.softDeleteLocation(id);
+		return ResponseEntity.ok("Location deleted successfully");
+	}
+}

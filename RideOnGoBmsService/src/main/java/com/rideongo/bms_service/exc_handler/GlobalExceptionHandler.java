@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.rideongo.bms_service.custom_exceptions.BikeNotFoundException;
 import com.rideongo.bms_service.custom_exceptions.BookingNotFoundException;
 import com.rideongo.bms_service.custom_exceptions.DuplicateBrandException;
+import com.rideongo.bms_service.custom_exceptions.PaymentException;
 import com.rideongo.bms_service.custom_exceptions.ResourceNotFoundException;
 import com.rideongo.bms_service.dtos.ApiResponse;
 
@@ -51,7 +52,10 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
 	}
 	
-
+	@ExceptionHandler(PaymentException.class)
+	public ResponseEntity<?> handlePaymentException(PaymentException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+	}
 
 	
 	
