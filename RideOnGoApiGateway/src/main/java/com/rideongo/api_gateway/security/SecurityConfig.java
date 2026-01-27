@@ -47,6 +47,7 @@ public class SecurityConfig {
 //                		.pathMatchers(HttpMethod.GET, "/doctors","/demo").permitAll()
                         .pathMatchers("/users/signin").permitAll() // UMS login/register
                         .pathMatchers(HttpMethod.GET, "/users").hasAnyRole("ADMIN")
+                        .pathMatchers("/bms/**").hasAnyRole("ADMIN")
 //                    	// only patient can book the appointment
 //        				.pathMatchers(HttpMethod.POST, "/appointments").hasRole("PATIENT")
 //        				//  patient or doctor can cancel the appointment
@@ -56,7 +57,7 @@ public class SecurityConfig {
 //        				// admin | doctor can check specific doc details, specific appointment details
 //        				.pathMatchers(HttpMethod.GET, "/doctors/*","/appointments/doctors/**").hasAnyRole("ADMIN","DOCTOR")
 //        				// only doctor can change appointment status to complete & add some diag tests
-//        				.pathMatchers(HttpMethod.POST, "/appointments/mark-complete-with-tests").hasRole("DOCTOR")
+        				.pathMatchers(HttpMethod.POST, "/appointments/mark-complete-with-tests").hasRole("DOCTOR")
         				// authenticate any other remaining request        		
                         .anyExchange().authenticated()
                         )
