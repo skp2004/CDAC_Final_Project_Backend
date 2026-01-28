@@ -14,4 +14,6 @@ public class BrandResponseDTO {
 
 	private Long brandId;
 	private String brandName;
+	private Boolean isActive; 
+	private Long totalBikes;
 }

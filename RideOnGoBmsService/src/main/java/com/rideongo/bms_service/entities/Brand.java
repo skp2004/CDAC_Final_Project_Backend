@@ -21,4 +21,7 @@ public class Brand extends BaseEntity {
 
 	@Column(name = "brand_name", nullable = false, length = 50)
 	private String brandName;
+	
+	@Column(name = "is_active", nullable = false)
+	private Boolean isActive = true; 
 }

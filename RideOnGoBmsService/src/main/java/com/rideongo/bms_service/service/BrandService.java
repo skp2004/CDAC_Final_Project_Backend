@@ -17,4 +17,6 @@ public interface BrandService {
 	List<BrandResponseDTO> getAllBrands();
 
 	void deleteBrand(Long brandId);
+	List<BrandResponseDTO> getActiveBrands();
+	void toggleBrandStatus(Long brandId, Boolean isActive);
 }

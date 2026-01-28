@@ -1,6 +1,7 @@
 package com.rideongo.bms_service.dtos;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,4 +26,6 @@ public class LocationRequestDTO {
 	@NotBlank(message = "Contact number is required")
 	@Pattern(regexp = "^[0-9]{10}$", message = "Invalid contact number")
 	private String contactNumber;
+	@NotNull
+	private Boolean isActive;
 }
