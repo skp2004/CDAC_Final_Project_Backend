@@ -3,6 +3,7 @@ package com.rideongo.ums_service.exc_handler;
 
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,12 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.rideongo.ums_service.custom_exceptions.ResourceNotFoundException;
+import com.rideongo.ums_service.custom_exceptions.UnauthorizedException;
 import com.rideongo.ums_service.dtos.ApiResponse;
 
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +72,10 @@ public class GlobalExceptionHandler {
 		System.out.println("in catch -Spring sec detected  Authentication Exception "+e);
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Failed", e.getMessage()));
 	}
-
-
+	@ExceptionHandler(UnauthorizedException.class)
+	public ResponseEntity<?> handleUnauthorizedException(UnauthorizedException ex) {
+	    log.error("Unauthorized access attempt: {}", ex.getMessage());
+	    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+	            .body(new ApiResponse("Failed", ex.getMessage()));
+	}
 }

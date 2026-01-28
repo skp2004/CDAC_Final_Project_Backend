@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 //JWT , message
 public class AuthResp {
-	private String jwt;
+	private String token;
 	private String message;
 	
 }

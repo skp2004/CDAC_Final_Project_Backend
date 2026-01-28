@@ -27,7 +27,7 @@ public interface UserService {
 	ApiResponse updateDetails(Long id, User user);
 
 	AuthResp authenticate(AuthRequest request);
-
+	AuthResp authenticateAdmin(AuthRequest request);
 	ApiResponse encryptPasswords();
 
 	ApiResponse userSignup(UserSignupRequest request, 

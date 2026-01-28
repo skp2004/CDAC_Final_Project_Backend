@@ -39,7 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -80,6 +79,12 @@ public class UserController {
 	public ResponseEntity<?> userSignIn(@RequestBody @Valid AuthRequest request) {
 		log.info("***** in user sign in {} ", request);
 		return ResponseEntity.ok(userService.authenticate(request));
+	}
+	@PostMapping("/admin/signin")
+	@Operation(description = "Admin Login")
+	public ResponseEntity<?> adminSignIn(@RequestBody @Valid AuthRequest request) {
+	    log.info("***** Admin sign in attempt for: {}", request.getEmail());
+	    return ResponseEntity.ok(userService.authenticateAdmin(request));
 	}
 
 	@PatchMapping("/pwd-encryption")
