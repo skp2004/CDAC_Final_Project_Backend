@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.rideongo.ums_service.custom_exceptions.InvalidInputException;
 import com.rideongo.ums_service.custom_exceptions.ResourceNotFoundException;
+import com.rideongo.ums_service.custom_exceptions.UnauthorizedException;
 import com.rideongo.ums_service.dtos.AdminSignupRequest;
 import com.rideongo.ums_service.dtos.ApiResponse;
 import com.rideongo.ums_service.dtos.AuthRequest;
@@ -114,7 +115,38 @@ public class UserServiceImpl implements UserService {
 		return new AuthResp(jwtUtils.generateToken(principal), "Successful Login");
 
 	}
+	@Override
+	public AuthResp authenticateAdmin(AuthRequest request) {
+	    System.out.println("in admin sign in " + request);
 
+	    // Create authentication token
+	    Authentication holder = new UsernamePasswordAuthenticationToken(
+	        request.getEmail(), 
+	        request.getPassword()
+	    );
+	    log.info("***** Before - is authenticated {}", holder.isAuthenticated());
+
+	    // Authenticate user credentials
+	    Authentication fullyAuth = authenticationManager.authenticate(holder);
+
+	    log.info("***** After - is authenticated {}", fullyAuth.isAuthenticated());
+	    log.info("**** auth {}", fullyAuth);
+
+	    // Get the authenticated user principal
+	    UserPrincipal principal = (UserPrincipal) fullyAuth.getPrincipal();
+	    
+	    // Check if user has ADMIN role
+	    boolean isAdmin = principal.getAuthorities().stream()
+	        .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+	    
+	    if (!isAdmin) {
+	        log.warn("***** Non-admin user attempted admin login: {}", request.getEmail());
+	        throw new UnauthorizedException("Access denied. Admin privileges required.");
+	    }
+
+	    log.info("***** Admin login successful for: {}", request.getEmail());
+	    return new AuthResp(jwtUtils.generateToken(principal), "Admin Login Successful");
+	}
 	@Override
 	public ApiResponse encryptPasswords() {
 		
