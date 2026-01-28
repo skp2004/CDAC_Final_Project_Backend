@@ -1,14 +1,29 @@
 package com.rideongo.bms_service.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rideongo.bms_service.dtos.BikeRequestDTO;
 import com.rideongo.bms_service.dtos.BikeResponseDTO;
+import com.rideongo.bms_service.dtos.BikeStatusUpdateDTO;
 import com.rideongo.bms_service.service.BikeService;
 
 import jakarta.validation.Valid;
@@ -22,13 +37,36 @@ import lombok.RequiredArgsConstructor;
 public class BikeController {
 
 	private final BikeService bikeService;
-
-	@PostMapping
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<BikeResponseDTO> createBike(
-			@RequestBody @Valid BikeRequestDTO dto) {
+	    @RequestPart("data") String data,
+	    @RequestPart(value = "image", required = false) MultipartFile image
+	) throws IOException {
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(bikeService.createBike(dto));
+	    ObjectMapper mapper = new ObjectMapper();
+	    BikeRequestDTO dto = mapper.readValue(data, BikeRequestDTO.class);
+
+	    return ResponseEntity.status(HttpStatus.CREATED)
+	            .body(bikeService.createBike(dto, image));
+	}
+
+
+	@PatchMapping("/{bikeId}/status") // NEW
+	public ResponseEntity<String> updateBikeStatus(
+			@PathVariable Long bikeId,
+			@RequestBody @Valid BikeStatusUpdateDTO dto) {
+
+		bikeService.updateBikeStatus(bikeId, dto.getStatus());
+		return ResponseEntity.ok("Bike status updated");
+	}
+
+	@GetMapping("/location/{locationId}") // NEW
+	public ResponseEntity<List<BikeResponseDTO>> getBikesByLocation(
+			@PathVariable Long locationId) {
+
+		return ResponseEntity.ok(
+				bikeService.getBikesByLocation(locationId)
+		);
 	}
 
 	@GetMapping("/{bikeId}")

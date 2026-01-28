@@ -11,6 +11,7 @@ public class BikeResponseDTO {
 
 	private Long bikeId;
 	private String brandName;
+	private Long locationId;
 	private Long cc;
 	private String colour;
 	private Long mileage;
@@ -18,4 +19,5 @@ public class BikeResponseDTO {
 	private Double ratePerDay;
 	private String fuelType;
 	private String status;
+	private String image; 
 }

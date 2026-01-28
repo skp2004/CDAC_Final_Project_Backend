@@ -49,4 +49,12 @@ public class Bike extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", length = 20, nullable = false)
 	private BikeStatus status;
+	
+	@ManyToOne(optional = false)          
+	@JoinColumn(name = "location_id", nullable = false) 
+	private Location location; 
+	
+
+	@Column(name = "image_url", length = 500) 
+	private String image;
 }
