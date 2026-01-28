@@ -53,6 +53,7 @@ public class SecurityConfig {
                 
                 // Admin-only endpoints
                 .pathMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
+                .pathMatchers(HttpMethod.POST, "/users/admin/signin").permitAll()
                 .pathMatchers("/bms/**").hasRole("ADMIN")
                 
                 // Doctor-only endpoints

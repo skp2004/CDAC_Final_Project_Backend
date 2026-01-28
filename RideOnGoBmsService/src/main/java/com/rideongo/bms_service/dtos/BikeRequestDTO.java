@@ -20,6 +20,9 @@ public class BikeRequestDTO {
 	@NotNull
 	@Size(min = 3, max = 30)
 	private String colour;
+	
+	@NotNull(message = "Location id is required")            
+	private Long locationId;
 
 	@NotNull
 	@Min(10)

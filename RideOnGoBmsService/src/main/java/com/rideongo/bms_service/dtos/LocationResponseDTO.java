@@ -14,4 +14,6 @@ public class LocationResponseDTO {
 	private String pincode;
 	private String contactNumber;
 	private boolean isActive;
+	private Long totalBikes;
+	
 }

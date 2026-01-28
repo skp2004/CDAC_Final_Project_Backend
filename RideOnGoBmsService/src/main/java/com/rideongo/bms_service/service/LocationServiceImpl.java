@@ -11,6 +11,7 @@ import com.rideongo.bms_service.custom_exceptions.ResourceNotFoundException;
 import com.rideongo.bms_service.dtos.LocationRequestDTO;
 import com.rideongo.bms_service.dtos.LocationResponseDTO;
 import com.rideongo.bms_service.entities.Location;
+import com.rideongo.bms_service.repository.BikeRepository;
 import com.rideongo.bms_service.repository.LocationRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class LocationServiceImpl implements LocationService {
 
 	private final LocationRepository locationRepository;
 	private final ModelMapper modelMapper;
+	private final BikeRepository bikeRepository;
 
 	@Override
 	public LocationResponseDTO addLocation(LocationRequestDTO dto) {
@@ -36,21 +38,38 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public List<LocationResponseDTO> getAllLocations() {
-		return locationRepository.findByIsDeletedFalse()
-				.stream()
-				.map(loc -> modelMapper.map(loc, LocationResponseDTO.class))
-				.toList();
-	}
+    public LocationResponseDTO getLocationById(Long locationId) {
 
-	@Override
-	public LocationResponseDTO getLocationById(Long locationId) {
-		Location location = locationRepository.findById(locationId)
-				.filter(l -> !l.isDeleted())
-				.orElseThrow(() -> new ResourceNotFoundException("Invalid location id"));
+        Location location = locationRepository.findById(locationId)
+                .filter(l -> !l.isDeleted())
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid location id"));
 
-		return modelMapper.map(location, LocationResponseDTO.class);
-	}
+        LocationResponseDTO dto =
+                modelMapper.map(location, LocationResponseDTO.class);
+
+        long total = bikeRepository.countByLocation_Id(locationId);
+        dto.setTotalBikes(total);   // ✅ inject extra field
+
+        return dto;
+    }
+
+    @Override
+    public List<LocationResponseDTO> getAllLocations() {
+
+        return locationRepository.findByIsDeletedFalse()
+                .stream()
+                .map(loc -> {
+                    LocationResponseDTO dto =
+                            modelMapper.map(loc, LocationResponseDTO.class);
+
+                    long total =
+                            bikeRepository.countByLocation_Id(loc.getId());
+
+                    dto.setTotalBikes(total);
+                    return dto;
+                })
+                .toList();
+    }
 
 	@Override
 	public void softDeleteLocation(Long locationId) {
