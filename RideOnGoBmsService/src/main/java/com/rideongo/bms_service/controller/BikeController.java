@@ -33,22 +33,17 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/bikes")
 @RequiredArgsConstructor
 @Validated
-@CrossOrigin(origins = "http://localhost:3000")
 public class BikeController {
 
 	private final BikeService bikeService;
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<BikeResponseDTO> createBike(
-	    @RequestPart("data") String data,
-	    @RequestPart(value = "image", required = false) MultipartFile image
-	) throws IOException {
-
-	    ObjectMapper mapper = new ObjectMapper();
-	    BikeRequestDTO dto = mapper.readValue(data, BikeRequestDTO.class);
-
-	    return ResponseEntity.status(HttpStatus.CREATED)
-	            .body(bikeService.createBike(dto, image));
-	}
+	public ResponseEntity createBike(
+		    @RequestPart("data") BikeRequestDTO dto,
+		    @RequestPart(value = "image", required = false) MultipartFile image
+		) throws IOException {
+		    return ResponseEntity.status(HttpStatus.CREATED)
+		        .body(bikeService.createBike(dto, image));
+		}
 
 
 	@PatchMapping("/{bikeId}/status") // NEW
