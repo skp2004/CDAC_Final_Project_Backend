@@ -19,11 +19,8 @@ public class UserDTO {
 	private String lastName;
 	private LocalDate dob;
 	private UserRole userRole;
-	public UserDTO(String firstName, String lastName, LocalDate dob) {
-		super();
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.dob = dob;
-	}
+	private String phone;
+	private String image;
+	private boolean isVerified;
 	
 }

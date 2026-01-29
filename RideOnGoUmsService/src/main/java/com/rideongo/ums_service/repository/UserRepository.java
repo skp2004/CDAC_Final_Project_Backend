@@ -30,9 +30,26 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	 * Get firstname , last name , dob of users from specified role , born
 	 * between specified start & end date
 	 */
-	@Query("select new com.rideongo.ums_service.dtos.UserDTO(u.firstName,u.lastName,u.dob)  from User u where u.userRole=:rl and u.dob between :start and :end")
-	List<UserDTO> getSelectedUserDetails(@Param("rl") UserRole role, @Param("start") LocalDate strt,
-			@Param("end") LocalDate end1);
+	@Query("""
+		    select new com.rideongo.ums_service.dtos.UserDTO(
+		        u.id,
+		        u.firstName,
+		        u.lastName,
+		        u.dob,
+		        u.userRole,
+		        u.phone,
+		        u.image,
+		        u.isVerified
+		    )
+		    from User u
+		    where u.userRole = :rl
+		      and u.dob between :start and :end
+		""")
+		List<UserDTO> getSelectedUserDetails(
+		        @Param("rl") UserRole role,
+		        @Param("start") LocalDate start,
+		        @Param("end") LocalDate end
+		);
 
 	
 	 //check if user already exists by same email or phone

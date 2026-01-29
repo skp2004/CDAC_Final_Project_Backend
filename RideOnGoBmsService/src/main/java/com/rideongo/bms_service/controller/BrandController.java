@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/brands")
 @RequiredArgsConstructor
 @Validated
-@CrossOrigin(origins = "http://localhost:3000")
 public class BrandController {
 
 	private final BrandService brandService;
