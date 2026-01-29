@@ -47,7 +47,7 @@ public class LocationServiceImpl implements LocationService {
         LocationResponseDTO dto =
                 modelMapper.map(location, LocationResponseDTO.class);
 
-        long total = bikeRepository.countByLocation_Id(locationId);
+        long total = bikeRepository.countByLocation_IdAndIsDeletedFalse(locationId);
         dto.setTotalBikes(total);   // ✅ inject extra field
 
         return dto;
@@ -63,7 +63,7 @@ public class LocationServiceImpl implements LocationService {
                             modelMapper.map(loc, LocationResponseDTO.class);
 
                     long total =
-                            bikeRepository.countByLocation_Id(loc.getId());
+                            bikeRepository.countByLocation_IdAndIsDeletedFalse(loc.getId());
 
                     dto.setTotalBikes(total);
                     return dto;
@@ -71,11 +71,54 @@ public class LocationServiceImpl implements LocationService {
                 .toList();
     }
 
+    @Override
+    public LocationResponseDTO updateLocation(Long locationId, LocationRequestDTO dto) { // 🟠 NEW
+
+    	Location location = locationRepository.findByIdAndIsDeletedFalse(locationId)
+    			.orElseThrow(() -> new ResourceNotFoundException("Invalid location id"));
+
+    	// check duplicate (same city + address, excluding self) // 🟠 NEW
+    	boolean exists =
+    			locationRepository.existsByAddressAndCityAndIsDeletedFalse(
+    					dto.getAddress(), dto.getCity());
+
+    	if (exists &&
+    		(!location.getAddress().equals(dto.getAddress())
+    		|| !location.getCity().equals(dto.getCity()))) {
+    		throw new InvalidInputException("Location already exists");
+    	}
+
+    	location.setAddress(dto.getAddress());
+    	location.setCity(dto.getCity());
+    	location.setState(dto.getState());
+    	location.setPincode(dto.getPincode());
+    	location.setContactNumber(dto.getContactNumber());
+    	location.setActive(dto.getIsActive());
+
+    	LocationResponseDTO response =
+    			modelMapper.map(location, LocationResponseDTO.class);
+
+    	long total = bikeRepository.countByLocation_IdAndIsDeletedFalse(locationId); // 🟠 NEW
+    	response.setTotalBikes(total);
+
+    	return response;
+    }
+
+	
 	@Override
 	public void softDeleteLocation(Long locationId) {
-		Location location = locationRepository.findById(locationId)
+
+		Location location = locationRepository.findByIdAndIsDeletedFalse(locationId)
 				.orElseThrow(() -> new ResourceNotFoundException("Invalid location id"));
 
-		location.setDeleted(true);
+		long bikeCount =
+				bikeRepository.countByLocation_IdAndIsDeletedFalse(locationId);
+
+		if (bikeCount > 0) { 
+			throw new InvalidInputException(
+					"Cannot delete location. Bikes are associated with this location");
+		}
+
+		location.setIsDeleted(true); // soft delete
 	}
 }

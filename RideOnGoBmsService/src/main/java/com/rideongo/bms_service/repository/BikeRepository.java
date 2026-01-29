@@ -17,8 +17,8 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
 	List<Bike> findByStatusAndIsDeletedFalse(BikeStatus status);
 	List<Bike> findByLocation_IdAndIsDeletedFalse(Long locationId);
 	// to count the total no of bike of respective brand
-    long countByBrand_Id(Long brandId);
+	long countByBrand_IdAndIsDeletedFalse(Long brandId);
 	// to count the total no of bike in respective location
-    long countByLocation_Id(Long locationId);
+	long countByLocation_IdAndIsDeletedFalse(Long locationId);
 	
 }
