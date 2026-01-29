@@ -11,7 +11,8 @@ public class BikeResponseDTO {
 
 	private Long bikeId;
 	private String brandName;
-	private Long locationId;
+	private String locationCity;   
+	private String locationState;
 	private Long cc;
 	private String colour;
 	private Long mileage;

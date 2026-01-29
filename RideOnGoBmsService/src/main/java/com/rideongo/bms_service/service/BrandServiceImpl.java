@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.rideongo.bms_service.custom_exceptions.DuplicateBrandException;
+import com.rideongo.bms_service.custom_exceptions.InvalidInputException;
 import com.rideongo.bms_service.custom_exceptions.ResourceNotFoundException;
 import com.rideongo.bms_service.dtos.BrandRequestDTO;
 import com.rideongo.bms_service.dtos.BrandResponseDTO;
@@ -36,7 +37,7 @@ public class BrandServiceImpl implements BrandService {
 
 		Brand brand = modelMapper.map(dto, Brand.class);
 		Brand saved = brandRepository.save(brand);
-		long total = bikeRepository.countByBrand_Id(brand.getId());
+		long total = bikeRepository.countByBrand_IdAndIsDeletedFalse(brand.getId());
 		
 
 		return new BrandResponseDTO(saved.getId(), saved.getBrandName(), saved.getIsActive(),total);
@@ -49,7 +50,7 @@ public class BrandServiceImpl implements BrandService {
 				.orElseThrow(() -> new ResourceNotFoundException("Brand not found"));
 
 		brand.setBrandName(dto.getBrandName());
-		long total = bikeRepository.countByBrand_Id(brand.getId());
+		long total = bikeRepository.countByBrand_IdAndIsDeletedFalse(brand.getId());
 
 		return new BrandResponseDTO(brand.getId(), brand.getBrandName(), brand.getIsActive(),total);
 	}
@@ -60,7 +61,7 @@ public class BrandServiceImpl implements BrandService {
         Brand brand = brandRepository.findByIdAndIsDeletedFalse(brandId)
                 .orElseThrow(() -> new ResourceNotFoundException("Brand not found"));
 
-        long total = bikeRepository.countByBrand_Id(brandId);
+        long total = bikeRepository.countByBrand_IdAndIsDeletedFalse(brandId);
 
         return new BrandResponseDTO(
                 brand.getId(),
@@ -79,18 +80,26 @@ public class BrandServiceImpl implements BrandService {
                         b.getId(),
                         b.getBrandName(),
                         b.getIsActive(),
-                        bikeRepository.countByBrand_Id(b.getId())
+                        bikeRepository.countByBrand_IdAndIsDeletedFalse(b.getId())
                 ))
                 .toList();
     }
+
 	@Override
 	public void deleteBrand(Long brandId) {
 
 		Brand brand = brandRepository.findByIdAndIsDeletedFalse(brandId)
 				.orElseThrow(() -> new ResourceNotFoundException("Brand not found"));
 
-		brand.setIsDeleted(true);
-		brandRepository.save(brand);
+		long bikeCount =
+				bikeRepository.countByBrand_IdAndIsDeletedFalse(brandId);
+
+		if (bikeCount > 0) { 
+			throw new InvalidInputException(
+					"Cannot delete brand. Bikes are associated with this brand");
+		}
+
+		brand.setIsDeleted(true); // soft delete
 	}
 	@Override
 	public void toggleBrandStatus(Long brandId, Boolean isActive) {
@@ -115,7 +124,7 @@ public class BrandServiceImpl implements BrandService {
 				brand.getId(),
 				brand.getBrandName(),
 				brand.getIsActive(),
-				bikeRepository.countByBrand_Id(brand.getId())
+				bikeRepository.countByBrand_IdAndIsDeletedFalse(brand.getId())
 		);
 	}
 }
