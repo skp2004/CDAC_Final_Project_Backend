@@ -13,5 +13,7 @@ public interface LocationService {
 
 	LocationResponseDTO getLocationById(Long locationId);
 
+	LocationResponseDTO updateLocation(Long locationId, LocationRequestDTO dto);
+
 	void softDeleteLocation(Long locationId);
 }

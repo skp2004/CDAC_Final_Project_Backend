@@ -38,6 +38,16 @@ public class LocationController {
 		return ResponseEntity.ok(locationService.getLocationById(id));
 	}
 
+	@PutMapping("/{id}") 
+	public ResponseEntity<LocationResponseDTO> updateLocation(
+			@PathVariable Long id,
+			@RequestBody @Valid LocationRequestDTO dto) {
+
+		return ResponseEntity.ok(
+				locationService.updateLocation(id, dto)
+		);
+	}
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteLocation(@PathVariable Long id) {
 		locationService.softDeleteLocation(id);

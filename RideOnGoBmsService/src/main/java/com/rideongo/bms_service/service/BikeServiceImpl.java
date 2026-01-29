@@ -133,7 +133,8 @@ public class BikeServiceImpl implements BikeService {
 		return new BikeResponseDTO(
 				bike.getId(),
 				bike.getBrand().getBrandName(),
-				bike.getLocation().getId(),
+				bike.getLocation().getCity(),   
+				bike.getLocation().getState(), 
 				bike.getCc(),
 				bike.getColour(),
 				bike.getMileage(),

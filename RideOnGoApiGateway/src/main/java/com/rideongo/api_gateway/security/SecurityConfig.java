@@ -56,6 +56,17 @@ public class SecurityConfig {
                 .pathMatchers(HttpMethod.POST, "/users/admin/signin").permitAll()
                 .pathMatchers(HttpMethod.GET,"/bms/**").hasRole("ADMIN")
                 
+                // 🟠 BMS: Get ALL bikes → ADMIN + USER
+                .pathMatchers(HttpMethod.GET, "/bms/bikes")
+                    .hasAnyRole("ADMIN", "USER")   // 🟠 CHANGED
+
+                // 🟠 BMS: All other BMS APIs → ADMIN only
+                .pathMatchers("/bms/**")
+                    .hasRole("ADMIN")             // 🟠 CHANGED
+
+                // Admin-only endpoints
+                .pathMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
+
                 // Doctor-only endpoints
                 .pathMatchers(HttpMethod.POST, "/appointments/mark-complete-with-tests")
                     .hasRole("DOCTOR")
