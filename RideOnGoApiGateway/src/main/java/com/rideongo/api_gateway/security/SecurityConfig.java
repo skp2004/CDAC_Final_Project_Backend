@@ -59,6 +59,9 @@ public class SecurityConfig {
                 // 🟠 BMS: Get ALL bikes → ADMIN + USER
                 .pathMatchers(HttpMethod.GET, "/bms/bikes")
                     .hasAnyRole("ADMIN", "USER")   // 🟠 CHANGED
+                 // For review endpoints
+                .pathMatchers(HttpMethod.POST,"/bms/reviews").hasRole("CUSTOMER")
+
 
                 // 🟠 BMS: All other BMS APIs → ADMIN only
                 .pathMatchers("/bms/**")
@@ -66,7 +69,7 @@ public class SecurityConfig {
 
                 // Admin-only endpoints
                 .pathMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
-
+                
                 // Doctor-only endpoints
                 .pathMatchers(HttpMethod.POST, "/appointments/mark-complete-with-tests")
                     .hasRole("DOCTOR")

@@ -120,6 +120,12 @@
 			<version>1.39.0</version>
 			<scope>compile</scope>
 		</dependency>
+		<!-- 🟧 Open feign dependencySSSS -->
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>

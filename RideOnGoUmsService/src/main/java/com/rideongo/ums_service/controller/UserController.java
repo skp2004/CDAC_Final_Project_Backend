@@ -156,6 +156,19 @@ public class UserController {
 				userService.getLoggedInUserProfile(email)
 		);
 	}
+	
+	@GetMapping("/me/id") 
+	public ResponseEntity<Long> getLoggedInUserId(
+	        @RequestHeader("Authorization") String authHeader 
+	) {
+	    String token = authHeader.substring(7); 
+
+	    return ResponseEntity.ok(
+	        jwtUtils.extractUserId(token) 
+	    );
+	}
+
+
 }
 
 
