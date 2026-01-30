@@ -41,4 +41,14 @@ public class BikeRequestDTO {
 
 	@NotNull
 	private String status;
+	@NotNull
+    @Size(min = 20, max = 2000)
+    private String description;
+
+    @NotNull
+    private String category;
+
+    @NotNull
+    @Min(1)
+    private Double pricePer7Days;
 }
