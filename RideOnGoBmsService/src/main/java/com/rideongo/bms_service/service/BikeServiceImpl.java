@@ -13,6 +13,7 @@ import com.rideongo.bms_service.custom_exceptions.ResourceNotFoundException;
 import com.rideongo.bms_service.dtos.BikeRequestDTO;
 import com.rideongo.bms_service.dtos.BikeResponseDTO;
 import com.rideongo.bms_service.entities.Bike;
+import com.rideongo.bms_service.entities.BikeCategory;
 import com.rideongo.bms_service.entities.BikeStatus;
 import com.rideongo.bms_service.entities.Brand;
 import com.rideongo.bms_service.entities.FuelType;
@@ -53,8 +54,12 @@ public class BikeServiceImpl implements BikeService {
 		bike.setRatePerDay(dto.getRatePerDay());
 		bike.setFuelType(FuelType.valueOf(dto.getFuelType()));
 		bike.setStatus(BikeStatus.valueOf(dto.getStatus()));
+		bike.setDescription(dto.getDescription());
+		bike.setCategory(BikeCategory.valueOf(dto.getCategory().toUpperCase()));
+		bike.setPricePer7Days(dto.getPricePer7Days());
 
-		if (image != null && !image.isEmpty()) { // NEW
+
+		if (image != null && !image.isEmpty()) { 
 			String imageUrl = cloudinaryService.uploadImage(
 					image,
 					"rideongo/bikes"
@@ -97,6 +102,10 @@ public class BikeServiceImpl implements BikeService {
 		bike.setRatePerDay(dto.getRatePerDay());
 		bike.setFuelType(FuelType.valueOf(dto.getFuelType().toUpperCase()));
 		bike.setStatus(BikeStatus.valueOf(dto.getStatus().toUpperCase()));
+		bike.setDescription(dto.getDescription());
+		bike.setCategory(BikeCategory.valueOf(dto.getCategory().toUpperCase()));
+		bike.setPricePer7Days(dto.getPricePer7Days());
+
 
 		return mapToResponse(bike);
 	}
@@ -142,7 +151,10 @@ public class BikeServiceImpl implements BikeService {
 				bike.getRatePerDay(),
 				bike.getFuelType().name(),
 				bike.getStatus().name(),
-				bike.getImage()
+				bike.getImage(),
+				bike.getDescription(),          
+		        bike.getCategory().name(),      
+		        bike.getPricePer7Days()
 		);
 	}
 }
