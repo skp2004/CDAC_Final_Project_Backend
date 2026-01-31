@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,11 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.rideongo.ums_service.dtos.AdminSignupRequest;
+import com.rideongo.ums_service.dtos.ApiResponse;
 import com.rideongo.ums_service.dtos.AuthRequest;
+import com.rideongo.ums_service.dtos.UpdatePasswordDTO;
+import com.rideongo.ums_service.dtos.UpdateUserRequestDTO;
 import com.rideongo.ums_service.dtos.UserDTO;
 import com.rideongo.ums_service.dtos.UserProfileResponseDTO;
 import com.rideongo.ums_service.dtos.UserSignupRequest;
-import com.rideongo.ums_service.entities.User;
 import com.rideongo.ums_service.security.JwtUtils;
 import com.rideongo.ums_service.service.UserService;
 
@@ -65,14 +66,26 @@ public class UserController {
 
 	}
 
+	
 	@PutMapping("/{id}")
 	@Operation(description = "Complete Update user details")
-	public ResponseEntity<?> updateUserDetails(@PathVariable Long id, @RequestBody User user) {
-		System.out.println("in update " + id + " " + user);
+	public ResponseEntity<ApiResponse> updateUserDetails(
+	        @PathVariable Long id,
+	        @RequestBody @Valid UpdateUserRequestDTO dto) {
 
-		return ResponseEntity.ok(userService.updateDetails(id, user));
-
+	    return ResponseEntity.ok(userService.updateDetails(id, dto));
 	}
+	
+	@PatchMapping("/{id}/password")
+	@Operation(description = "Update user password")
+	public ResponseEntity<ApiResponse> updatePassword(
+	        @PathVariable Long id,
+	        @RequestBody @Valid UpdatePasswordDTO dto) {
+
+	    return ResponseEntity.ok(userService.updatePassword(id, dto));
+	}
+
+
 
 	@PostMapping("/signin")
 	@Operation(description = "User Login")

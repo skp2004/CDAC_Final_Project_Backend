@@ -9,6 +9,8 @@ import com.rideongo.ums_service.dtos.AdminSignupRequest;
 import com.rideongo.ums_service.dtos.ApiResponse;
 import com.rideongo.ums_service.dtos.AuthRequest;
 import com.rideongo.ums_service.dtos.AuthResp;
+import com.rideongo.ums_service.dtos.UpdatePasswordDTO;
+import com.rideongo.ums_service.dtos.UpdateUserRequestDTO;
 import com.rideongo.ums_service.dtos.UserDTO;
 import com.rideongo.ums_service.dtos.UserProfileResponseDTO;
 import com.rideongo.ums_service.dtos.UserSignupRequest;
@@ -24,10 +26,11 @@ public interface UserService {
 
 	User getUserDetails(Long userId);
 
-	ApiResponse updateDetails(Long id, User user);
+	ApiResponse updateDetails(Long id, UpdateUserRequestDTO dto);
 
 	AuthResp authenticate(AuthRequest request);
 	AuthResp authenticateAdmin(AuthRequest request);
+	ApiResponse updatePassword(Long userId, UpdatePasswordDTO dto);
 	ApiResponse encryptPasswords();
 
 	ApiResponse userSignup(UserSignupRequest request, 

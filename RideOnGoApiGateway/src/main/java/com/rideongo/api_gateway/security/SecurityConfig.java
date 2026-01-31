@@ -43,40 +43,43 @@ public class SecurityConfig {
             
             // Authorization rules
             .authorizeExchange(auth -> auth
-                // CRITICAL: Allow ALL OPTIONS requests (CORS preflight)
-                .pathMatchers(HttpMethod.OPTIONS).permitAll()
-                
-                // Public endpoints
-                .pathMatchers(HttpMethod.POST, "/users/signin").permitAll()
-                .pathMatchers(HttpMethod.POST, "/users/signup").permitAll()
-                .pathMatchers(HttpMethod.POST, "/users/register").permitAll()
-                
-                // Admin-only endpoints
-                .pathMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
-                .pathMatchers(HttpMethod.POST, "/users/admin/signin").permitAll()
-                .pathMatchers(HttpMethod.GET,"/bms/**").hasRole("ADMIN")
-                
-                // 🟠 BMS: Get ALL bikes → ADMIN + USER
-                .pathMatchers(HttpMethod.GET, "/bms/bikes")
-                    .hasAnyRole("ADMIN", "USER")   // 🟠 CHANGED
-                 // For review endpoints
-                .pathMatchers(HttpMethod.POST,"/bms/reviews").hasRole("CUSTOMER")
+                    // CRITICAL: Allow ALL OPTIONS requests (CORS preflight)
+                    .pathMatchers(HttpMethod.OPTIONS).permitAll()
+                    
+                    // Public endpoints
+                    .pathMatchers(HttpMethod.POST, "/users/signin").permitAll()
+                    .pathMatchers(HttpMethod.POST, "/users/signup").permitAll()
+                    .pathMatchers(HttpMethod.POST, "/users/register").permitAll()
+                    .pathMatchers(HttpMethod.GET, "/bms/bikes")
+                    .permitAll() 
+                    // To get bike in a city and city,id in all endpoints 
+                    .pathMatchers(HttpMethod.GET, "/bms/locations/cities").permitAll()   
+                    .pathMatchers(HttpMethod.GET, "/bms/locations/city/*/bikes").permitAll()
+                    // Admin-only endpoints
+                    .pathMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
+                    .pathMatchers(HttpMethod.POST, "/users/admin/signin").permitAll()
+                    .pathMatchers(HttpMethod.GET,"/bms/**").hasRole("ADMIN")
+                    
+                    // 🟠 BMS: Get ALL bikes → ADMIN + USER
+                   // 🟠 CHANGED
+                     // For review endpoints
+                    .pathMatchers(HttpMethod.POST,"/bms/reviews").hasRole("CUSTOMER")
 
 
-                // 🟠 BMS: All other BMS APIs → ADMIN only
-                .pathMatchers("/bms/**")
-                    .hasRole("ADMIN")             // 🟠 CHANGED
+                    // 🟠 BMS: All other BMS APIs → ADMIN only
+                    .pathMatchers("/bms/**")
+                        .hasRole("ADMIN")             
 
-                // Admin-only endpoints
-                .pathMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
-                
-                // Doctor-only endpoints
-                .pathMatchers(HttpMethod.POST, "/appointments/mark-complete-with-tests")
-                    .hasRole("DOCTOR")
-                
-                // All other requests need authentication
-                .anyExchange().authenticated()
-            )
+                    // Admin-only endpoints
+                    .pathMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
+                    
+                    // Doctor-only endpoints
+                    .pathMatchers(HttpMethod.POST, "/appointments/mark-complete-with-tests")
+                        .hasRole("DOCTOR")
+                    
+                    // All other requests need authentication
+                    .anyExchange().authenticated()
+                )
             
             // Add JWT filter
             .addFilterAt(customJwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
