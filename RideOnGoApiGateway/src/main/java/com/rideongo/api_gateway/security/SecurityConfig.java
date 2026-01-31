@@ -50,6 +50,7 @@ public class SecurityConfig {
                     .pathMatchers(HttpMethod.POST, "/users/signin").permitAll()
                     .pathMatchers(HttpMethod.POST, "/users/signup").permitAll()
                     .pathMatchers(HttpMethod.POST, "/users/register").permitAll()
+                    
                     .pathMatchers(HttpMethod.GET, "/bms/bikes")
                     .permitAll() 
                     // To get bike in a city and city,id in all endpoints 
@@ -59,14 +60,19 @@ public class SecurityConfig {
                     .pathMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
                     .pathMatchers(HttpMethod.POST, "/users/admin/signin").permitAll()
                     .pathMatchers(HttpMethod.GET,"/bms/**").hasRole("ADMIN")
-                    
-                    // 🟠 BMS: Get ALL bikes → ADMIN + USER
-                   // 🟠 CHANGED
+                  
                      // For review endpoints
                     .pathMatchers(HttpMethod.POST,"/bms/reviews").hasRole("CUSTOMER")
 
+                    // UMS: Self-service APIs (ALL authenticated roles)
+                    .pathMatchers(HttpMethod.PUT, "/users/me").authenticated()
+                    .pathMatchers(HttpMethod.PATCH, "/users/me/password").authenticated()
 
-                    // 🟠 BMS: All other BMS APIs → ADMIN only
+                    //  UMS: Admin-only ID based updates
+                    .pathMatchers(HttpMethod.PUT, "/users/*").hasRole("ADMIN")
+                    .pathMatchers(HttpMethod.PATCH, "/users/*/password").hasRole("ADMIN")
+
+                    //  BMS: All other BMS APIs → ADMIN only
                     .pathMatchers("/bms/**")
                         .hasRole("ADMIN")             
 
