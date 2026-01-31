@@ -54,5 +54,18 @@ public class JwtUtils {
 				.getPayload();
 		
 	}
+	public Long extractUserId(String token) {
+
+	    if (token.startsWith("Bearer ")) {          
+	        token = token.substring(7);             
+	    }
+
+	    Claims claims = validateToken(token);        
+
+	    return Long.parseLong(
+	        claims.get("user_id", String.class)      
+	    );
+	}
+
 
 }

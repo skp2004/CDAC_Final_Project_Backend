@@ -57,4 +57,14 @@ public class Bike extends BaseEntity {
 
 	@Column(name = "image_url", length = 500) 
 	private String image;
+	
+	@Column(name = "description", length = 2000)
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", length = 20, nullable = false)
+    private BikeCategory category;
+
+    @Column(name = "price_per_7_days", nullable = false)
+    private Double pricePer7Days;
 }

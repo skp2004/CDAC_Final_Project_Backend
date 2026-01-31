@@ -21,4 +21,7 @@ public class BikeResponseDTO {
 	private String fuelType;
 	private String status;
 	private String image; 
+	private String description;
+    private String category;  
+    private Double pricePer7Days;
 }
