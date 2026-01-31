@@ -9,6 +9,34 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BikeResponseDTO {
 
+	public BikeResponseDTO(
+	        Long bikeId2,
+	        String brandName2,
+	        String locationCity2,
+	        String locationState2,
+	        Long cc2,
+	        String colour2,
+	        Long mileage2,
+	        Double ratePerHour2,
+	        Double ratePerDay2,
+	        String fuelType2,
+	        String status2,
+	        String image2
+	) {
+	    this.bikeId = bikeId2;
+	    this.brandName = brandName2;
+	    this.locationCity = locationCity2;
+	    this.locationState = locationState2;
+	    this.cc = cc2;
+	    this.colour = colour2;
+	    this.mileage = mileage2;
+	    this.ratePerHour = ratePerHour2;
+	    this.ratePerDay = ratePerDay2;
+	    this.fuelType = fuelType2;
+	    this.status = status2;
+	    this.image = image2;
+	}
+
 	private Long bikeId;
 	private String brandName;
 	private String locationCity;   
