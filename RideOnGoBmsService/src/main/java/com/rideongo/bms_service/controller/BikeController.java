@@ -60,7 +60,7 @@ public class BikeController {
 			@PathVariable Long locationId) {
 
 		return ResponseEntity.ok(
-				bikeService.getBikesByLocation(locationId)
+				bikeService.getBikesByLocationId(locationId)
 		);
 	}
 

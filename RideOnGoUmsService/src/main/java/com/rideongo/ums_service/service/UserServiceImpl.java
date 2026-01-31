@@ -19,6 +19,8 @@ import com.rideongo.ums_service.dtos.AdminSignupRequest;
 import com.rideongo.ums_service.dtos.ApiResponse;
 import com.rideongo.ums_service.dtos.AuthRequest;
 import com.rideongo.ums_service.dtos.AuthResp;
+import com.rideongo.ums_service.dtos.UpdatePasswordDTO;
+import com.rideongo.ums_service.dtos.UpdateUserRequestDTO;
 import com.rideongo.ums_service.dtos.UserDTO;
 import com.rideongo.ums_service.dtos.UserProfileResponseDTO;
 import com.rideongo.ums_service.dtos.UserSignupRequest;
@@ -86,17 +88,40 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ApiResponse updateDetails(Long id, User user) {
+	public ApiResponse updateDetails(Long id, UpdateUserRequestDTO dto) {
 
-		User persistentUser = getUserDetails(id);
+	    User user = getUserDetails(id);
 
-		persistentUser.setDob(user.getDob());
-		persistentUser.setFirstName(user.getFirstName());
-		persistentUser.setLastName(user.getLastName());
-		persistentUser.setPassword(user.getPassword());
+	    user.setFirstName(dto.getFirstName());
+	    user.setLastName(dto.getLastName());
+	    user.setDob(dto.getDob());
+	    user.setPhone(dto.getPhone());
 
-		return new ApiResponse("Success", "Updated user details");
+	    return new ApiResponse("SUCCESS", "User details updated successfully");
 	}
+
+	@Override
+	public ApiResponse updatePassword(Long userId, UpdatePasswordDTO dto) {
+
+	    // 1️⃣ Fetch user from DB
+	    User user = userRepository.findById(userId)
+	            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+	    // 2️⃣ Verify OLD password
+	    if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+	        throw new InvalidInputException("Old password is incorrect");
+	    }
+
+	    // 3️⃣ Encrypt NEW password
+	    String encodedPassword = passwordEncoder.encode(dto.getNewPassword());
+
+	    // 4️⃣ Update password
+	    user.setPassword(encodedPassword);
+
+	    // 5️⃣ Hibernate auto-update (Transactional)
+	    return new ApiResponse("SUCCESS", "Password updated successfully");
+	}
+
 
 	@Override
 	public AuthResp authenticate(AuthRequest request) {

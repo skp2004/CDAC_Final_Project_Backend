@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.rideongo.bms_service.custom_exceptions.InvalidInputException;
 import com.rideongo.bms_service.custom_exceptions.ResourceNotFoundException;
+import com.rideongo.bms_service.dtos.BikeResponseDTO;
+import com.rideongo.bms_service.dtos.CityResponseDTO;
 import com.rideongo.bms_service.dtos.LocationRequestDTO;
 import com.rideongo.bms_service.dtos.LocationResponseDTO;
 import com.rideongo.bms_service.entities.Location;
@@ -70,6 +72,40 @@ public class LocationServiceImpl implements LocationService {
                 })
                 .toList();
     }
+    @Override
+    public List<CityResponseDTO> getAllCities() { 
+
+    	return locationRepository.findByIsDeletedFalseAndIsActiveTrue()
+    			.stream()
+    			.map(loc -> new CityResponseDTO(
+    					loc.getId(),
+    					loc.getCity()
+    			))
+    			.toList();
+    }
+
+    @Override
+    public List<BikeResponseDTO> getBikesByCity(String city) { 
+
+    	return bikeRepository.findByLocation_CityAndIsDeletedFalse(city)
+    			.stream()
+    			.map(bike -> new BikeResponseDTO(
+    					bike.getId(),
+    					bike.getBrand().getBrandName(),
+    					bike.getLocation().getCity(),
+    					bike.getLocation().getState(),
+    					bike.getCc(),
+    					bike.getColour(),
+    					bike.getMileage(),
+    					bike.getRatePerHour(),
+    					bike.getRatePerDay(),
+    					bike.getFuelType().name(),
+    					bike.getStatus().name(),
+    					bike.getImage()
+    			))
+    			.toList();
+    }
+
 
     @Override
     public LocationResponseDTO updateLocation(Long locationId, LocationRequestDTO dto) { // 🟠 NEW

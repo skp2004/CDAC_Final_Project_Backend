@@ -20,5 +20,8 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
 	long countByBrand_IdAndIsDeletedFalse(Long brandId);
 	// to count the total no of bike in respective location
 	long countByLocation_IdAndIsDeletedFalse(Long locationId);
+	// To get bike availble in particular city
+	List<Bike> findByLocation_CityAndIsDeletedFalse(String city); 
+
 	
 }
