@@ -80,13 +80,20 @@ public class BikeServiceImpl implements BikeService {
 	}
 
 	@Override
-	public List<BikeResponseDTO> getBikesByLocation(Long locationId) {
+	public List<BikeResponseDTO> getBikesByLocationId(Long locationId) {
 
-		return bikeRepository.findByLocation_IdAndIsDeletedFalse(locationId)
-				.stream()
-				.map(this::mapToResponse)
-				.toList();
+	    Location location = locationRepository
+	            .findByIdAndIsDeletedFalse(locationId)
+	            .orElseThrow(() ->
+	                new ResourceNotFoundException("Location not found"));
+
+	    return bikeRepository
+	            .findByLocation_IdAndIsDeletedFalse(locationId)
+	            .stream()
+	            .map(this::mapToResponse)
+	            .toList();
 	}
+
 
 
 	@Override

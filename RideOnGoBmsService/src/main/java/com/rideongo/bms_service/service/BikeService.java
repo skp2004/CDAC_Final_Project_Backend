@@ -23,7 +23,7 @@ public interface BikeService {
 	List<BikeResponseDTO> getAllBikes();
 
 	void deleteBike(Long bikeId);
-	List<BikeResponseDTO> getBikesByLocation(Long locationId);
+	List<BikeResponseDTO> getBikesByLocationId(Long locationId);
 
 	void updateBikeStatus(Long bikeId, String status); 
 }
