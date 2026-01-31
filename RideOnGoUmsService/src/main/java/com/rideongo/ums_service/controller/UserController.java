@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.rideongo.ums_service.dtos.AdminResetPasswordDTO;
 import com.rideongo.ums_service.dtos.AdminSignupRequest;
 import com.rideongo.ums_service.dtos.ApiResponse;
 import com.rideongo.ums_service.dtos.AuthRequest;
@@ -75,14 +76,55 @@ public class UserController {
 
 	    return ResponseEntity.ok(userService.updateDetails(id, dto));
 	}
-	
-	@PatchMapping("/{id}/password")
-	@Operation(description = "Update user password")
-	public ResponseEntity<ApiResponse> updatePassword(
-	        @PathVariable Long id,
-	        @RequestBody @Valid UpdatePasswordDTO dto) {
 
-	    return ResponseEntity.ok(userService.updatePassword(id, dto));
+	
+	@PutMapping("/me")
+	@Operation(description = "Update logged-in user profile using JWT")
+	public ResponseEntity<ApiResponse> updateMyProfile(
+	        @RequestHeader("Authorization") String authHeader,
+	        @RequestBody @Valid UpdateUserRequestDTO dto
+	) {
+	    // Extract token
+	    String token = authHeader.substring(7);
+
+	    // Extract email from token
+	    String email = jwtUtils.validateToken(token).getSubject();
+
+	    log.info("Updating profile for logged-in user: {}", email);
+
+	    return ResponseEntity.ok(
+	            userService.updateUserByEmail(email, dto)
+	    );
+	}
+
+
+	
+
+	@PatchMapping("/{id}/password")
+	@Operation(description = "Admin resets user password")
+	public ResponseEntity<ApiResponse> adminResetPassword(
+	        @PathVariable Long id,
+	        @RequestBody @Valid AdminResetPasswordDTO dto
+	) {
+	    return ResponseEntity.ok(
+	            userService.updatePassword(id, dto)
+	    );
+	}
+
+	
+	
+	@PatchMapping("/me/password")
+	@Operation(description = "Update password for logged-in user")
+	public ResponseEntity<ApiResponse> updateMyPassword(
+	        @RequestHeader("Authorization") String authHeader,
+	        @RequestBody @Valid UpdatePasswordDTO dto
+	) {
+	    String token = authHeader.substring(7);
+	    String email = jwtUtils.validateToken(token).getSubject();
+
+	    return ResponseEntity.ok(
+	            userService.updatePasswordByEmail(email, dto)
+	    );
 	}
 
 

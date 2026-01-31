@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.rideongo.ums_service.dtos.AdminResetPasswordDTO;
 import com.rideongo.ums_service.dtos.AdminSignupRequest;
 import com.rideongo.ums_service.dtos.ApiResponse;
 import com.rideongo.ums_service.dtos.AuthRequest;
@@ -27,10 +28,13 @@ public interface UserService {
 	User getUserDetails(Long userId);
 
 	ApiResponse updateDetails(Long id, UpdateUserRequestDTO dto);
+	ApiResponse updateUserByEmail(String email, UpdateUserRequestDTO dto);
+	ApiResponse updatePasswordByEmail(String email, UpdatePasswordDTO dto);
+
 
 	AuthResp authenticate(AuthRequest request);
 	AuthResp authenticateAdmin(AuthRequest request);
-	ApiResponse updatePassword(Long userId, UpdatePasswordDTO dto);
+	ApiResponse updatePassword(Long userId, AdminResetPasswordDTO dto);
 	ApiResponse encryptPasswords();
 
 	ApiResponse userSignup(UserSignupRequest request, 

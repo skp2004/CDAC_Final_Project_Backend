@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.rideongo.ums_service.custom_exceptions.InvalidInputException;
 import com.rideongo.ums_service.custom_exceptions.ResourceNotFoundException;
 import com.rideongo.ums_service.custom_exceptions.UnauthorizedException;
+import com.rideongo.ums_service.dtos.AdminResetPasswordDTO;
 import com.rideongo.ums_service.dtos.AdminSignupRequest;
 import com.rideongo.ums_service.dtos.ApiResponse;
 import com.rideongo.ums_service.dtos.AuthRequest;
@@ -99,28 +100,72 @@ public class UserServiceImpl implements UserService {
 
 	    return new ApiResponse("SUCCESS", "User details updated successfully");
 	}
+	@Override
+	public ApiResponse updateUserByEmail(String email, UpdateUserRequestDTO dto) {
+
+	    User user = userRepository.findByEmail(email)
+	            .orElseThrow(() ->
+	                new ResourceNotFoundException("User not found"));
+
+	    user.setFirstName(dto.getFirstName());
+	    user.setLastName(dto.getLastName());
+	    user.setPhone(dto.getPhone());
+	    user.setDob(dto.getDob());
+
+	    return new ApiResponse("SUCCESS", "Profile updated successfully");
+	}
+
 
 	@Override
-	public ApiResponse updatePassword(Long userId, UpdatePasswordDTO dto) {
+	public ApiResponse updatePassword(Long userId, AdminResetPasswordDTO dto) {
 
-	    // 1️⃣ Fetch user from DB
 	    User user = userRepository.findById(userId)
 	            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-	    // 2️⃣ Verify OLD password
+	    // 🚫 NO OLD PASSWORD CHECK FOR ADMIN
+
+	    user.setPassword(
+	            passwordEncoder.encode(dto.getNewPassword())
+	    );
+
+	    return new ApiResponse(
+	            "SUCCESS",
+	            "Password reset successfully by admin"
+	    );
+	}
+
+	
+	@Override
+	public ApiResponse updatePasswordByEmail(String email, UpdatePasswordDTO dto) {
+
+	    // 1. Fetch user using email from JWT
+	    User user = userRepository.findByEmail(email)
+	            .orElseThrow(() ->
+	                new ResourceNotFoundException("User not found"));
+
+	    // 2. Validate old password
 	    if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
 	        throw new InvalidInputException("Old password is incorrect");
 	    }
 
-	    // 3️⃣ Encrypt NEW password
-	    String encodedPassword = passwordEncoder.encode(dto.getNewPassword());
+	    // 3. Prevent same password reuse
+	    if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) {
+	        throw new InvalidInputException("New password must be different from old password");
+	    }
 
-	    // 4️⃣ Update password
-	    user.setPassword(encodedPassword);
+	    // 4. Encode & update password
+	    user.setPassword(
+	            passwordEncoder.encode(dto.getNewPassword())
+	    );
 
-	    // 5️⃣ Hibernate auto-update (Transactional)
-	    return new ApiResponse("SUCCESS", "Password updated successfully");
+	    
+
+	    return new ApiResponse(
+	            "SUCCESS",
+	            "Password updated successfully"
+	    );
 	}
+
 
 
 	@Override
