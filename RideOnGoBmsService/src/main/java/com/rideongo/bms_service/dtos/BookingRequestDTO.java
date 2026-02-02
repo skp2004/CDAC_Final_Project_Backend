@@ -27,6 +27,13 @@ public class BookingRequestDTO {
 	private String rentalType;
 
 	@NotNull
+	private String pickupType; // DOORSTEP or STATION
+
+	private Long pickupLocationId; // Required if STATION
+
+	private String deliveryAddress; // Required if DOORSTEP
+
+	@NotNull
 	@Min(0)
 	private Double taxAmount;
 

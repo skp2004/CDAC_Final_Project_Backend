@@ -12,6 +12,7 @@ import com.rideongo.bms_service.dtos.BookingResponseDTO;
 import com.rideongo.bms_service.entities.*;
 import com.rideongo.bms_service.repository.BikeRepository;
 import com.rideongo.bms_service.repository.BookingRepository;
+import com.rideongo.bms_service.repository.LocationRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +23,7 @@ public class BookingServiceImpl implements BookingService {
 
 	private final BookingRepository bookingRepository;
 	private final BikeRepository bikeRepository;
+	private final LocationRepository locationRepository;
 
 	@Override
 	public BookingResponseDTO createBooking(BookingRequestDTO dto) {
@@ -35,6 +37,17 @@ public class BookingServiceImpl implements BookingService {
 		booking.setPickupTs(dto.getPickupTs());
 		booking.setDropTs(dto.getDropTs());
 		booking.setRentalType(RentalType.valueOf(dto.getRentalType().toUpperCase()));
+		booking.setPickupType(PickupType.valueOf(dto.getPickupType().toUpperCase()));
+
+		// Handle pickup location or delivery address based on pickup type
+		if (booking.getPickupType() == PickupType.STATION && dto.getPickupLocationId() != null) {
+			Location pickupLocation = locationRepository.findById(dto.getPickupLocationId())
+					.orElseThrow(() -> new ResourceNotFoundException("Pickup location not found"));
+			booking.setPickupLocation(pickupLocation);
+		} else if (booking.getPickupType() == PickupType.DOORSTEP) {
+			booking.setDeliveryAddress(dto.getDeliveryAddress());
+		}
+
 		booking.setTaxAmount(dto.getTaxAmount());
 		booking.setDiscountAmount(dto.getDiscountAmount());
 		booking.setTotalAmount(dto.getTotalAmount());
@@ -83,18 +96,52 @@ public class BookingServiceImpl implements BookingService {
 		bookingRepository.save(booking);
 	}
 
+	@Override
+	public BookingResponseDTO updateBookingStatus(Long bookingId, String status) {
+
+		Booking booking = bookingRepository.findByIdAndIsDeletedFalse(bookingId)
+				.orElseThrow(() -> new BookingNotFoundException("Booking not found"));
+
+		booking.setBookingStatus(BookingStatus.valueOf(status.toUpperCase()));
+		Booking saved = bookingRepository.save(booking);
+
+		return mapToResponse(saved);
+	}
+
+	@Override
+	public BookingResponseDTO updateRazorpayOrderId(Long bookingId, String razorpayOrderId) {
+
+		Booking booking = bookingRepository.findByIdAndIsDeletedFalse(bookingId)
+				.orElseThrow(() -> new BookingNotFoundException("Booking not found"));
+
+		booking.setRazorpayOrderId(razorpayOrderId);
+		Booking saved = bookingRepository.save(booking);
+
+		return mapToResponse(saved);
+	}
+
 	private BookingResponseDTO mapToResponse(Booking booking) {
-		return new BookingResponseDTO(
-				booking.getId(),
-				booking.getBike().getId(),
-				booking.getUserId(),
-				booking.getPickupTs(),
-				booking.getDropTs(),
-				booking.getRentalType().name(),
-				booking.getTaxAmount(),
-				booking.getDiscountAmount(),
-				booking.getTotalAmount(),
-				booking.getBookingStatus().name()
-		);
+		return BookingResponseDTO.builder()
+				.bookingId(booking.getId())
+				.bikeId(booking.getBike().getId())
+				.bikeName(booking.getBike().getBrand().getBrandName())
+				.bikeImage(booking.getBike().getImage())
+				.userId(booking.getUserId())
+				.pickupTs(booking.getPickupTs())
+				.dropTs(booking.getDropTs())
+				.rentalType(booking.getRentalType().name())
+				.pickupType(booking.getPickupType().name())
+				.pickupLocationId(booking.getPickupLocation() != null ? booking.getPickupLocation().getId() : null)
+				.pickupLocationAddress(
+						booking.getPickupLocation() != null ? booking.getPickupLocation().getAddress() : null)
+				.pickupLocationCity(booking.getPickupLocation() != null ? booking.getPickupLocation().getCity() : null)
+				.deliveryAddress(booking.getDeliveryAddress())
+				.taxAmount(booking.getTaxAmount())
+				.discountAmount(booking.getDiscountAmount())
+				.totalAmount(booking.getTotalAmount())
+				.bookingStatus(booking.getBookingStatus().name())
+				.razorpayOrderId(booking.getRazorpayOrderId())
+				.createdAt(booking.getCreatedAt())
+				.build();
 	}
 }

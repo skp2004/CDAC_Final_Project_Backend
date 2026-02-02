@@ -16,7 +16,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         
         // Allow specific origins (REQUIRED when using credentials)
-        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:*"));
+        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:*","https://7916668408c5.ngrok-free.app","http://nzgxs-103-241-82-144.a.free.pinggy.link","https://2qv1ps2h-5173.inc1.devtunnels.ms"));
         // OR be explicit:
         // config.setAllowedOrigins(Arrays.asList(
         //     "http://localhost:3000",

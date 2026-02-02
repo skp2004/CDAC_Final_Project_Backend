@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rideongo.bms_service.dtos.PaymentRequestDTO;
 import com.rideongo.bms_service.dtos.PaymentResponseDTO;
+import com.rideongo.bms_service.dtos.RazorpayOrderRequest;
+import com.rideongo.bms_service.dtos.RazorpayOrderResponse;
+import com.rideongo.bms_service.dtos.RazorpayPaymentVerification;
 import com.rideongo.bms_service.service.PaymentService;
 
 import jakarta.validation.Valid;
@@ -34,8 +37,12 @@ public class PaymentController {
 
 		return new ResponseEntity<>(
 				paymentService.makePayment(dto),
-				HttpStatus.CREATED
-		);
+				HttpStatus.CREATED);
+	}
+
+	@GetMapping
+	public ResponseEntity<List<PaymentResponseDTO>> getAllPayments() {
+		return ResponseEntity.ok(paymentService.getAllPayments());
 	}
 
 	@GetMapping("/booking/{bookingId}")
@@ -43,6 +50,20 @@ public class PaymentController {
 			@PathVariable Long bookingId) {
 
 		return ResponseEntity.ok(paymentService.getPaymentsByBooking(bookingId));
+	}
+
+	@PostMapping("/create-order")
+	public ResponseEntity<RazorpayOrderResponse> createRazorpayOrder(
+			@RequestBody @Valid RazorpayOrderRequest request) {
+
+		return ResponseEntity.ok(paymentService.createRazorpayOrder(request));
+	}
+
+	@PostMapping("/verify")
+	public ResponseEntity<PaymentResponseDTO> verifyPayment(
+			@RequestBody @Valid RazorpayPaymentVerification request) {
+
+		return ResponseEntity.ok(paymentService.verifyAndSavePayment(request));
 	}
 
 	@DeleteMapping("/{paymentId}")
