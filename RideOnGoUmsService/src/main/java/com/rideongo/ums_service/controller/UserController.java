@@ -85,7 +85,7 @@ public class UserController {
 	        @RequestBody @Valid UpdateUserRequestDTO dto
 	) {
 	    // Extract token
-	    String token = authHeader.substring(7);
+	    String token = authHeader.substring(7); 
 
 	    // Extract email from token
 	    String email = jwtUtils.validateToken(token).getSubject();
