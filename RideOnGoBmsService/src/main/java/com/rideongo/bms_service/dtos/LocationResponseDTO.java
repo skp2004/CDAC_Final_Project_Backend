@@ -1,5 +1,6 @@
 package com.rideongo.bms_service.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +14,8 @@ public class LocationResponseDTO {
 	private String state;
 	private String pincode;
 	private String contactNumber;
+	@JsonProperty("isActive")
 	private boolean isActive;
 	private Long totalBikes;
-	
+
 }
