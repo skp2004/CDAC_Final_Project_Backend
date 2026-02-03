@@ -12,7 +12,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class BookingResponseDTO {
 
 	private Long bookingId;
@@ -32,6 +31,21 @@ public class BookingResponseDTO {
 	private Double discountAmount;
 	private Double totalAmount;
 	private String bookingStatus;
-	private String razorpayOrderId;
+
+	// Additional fields for frontend display
+	private String bikeName;
+	private String bikeImage;
+	private String pickupType; // STATION or DOORSTEP
 	private LocalDateTime createdAt;
+
+	// Pickup Location details (for STATION pickup)
+	private Long pickupLocationId;
+	private String pickupLocationAddress;
+	private String pickupLocationCity;
+	private String pickupLocationState;
+	private String pickupLocationPincode;
+	private String pickupLocationContact;
+
+	// Delivery address (for DOORSTEP delivery)
+	private String deliveryAddress;
 }

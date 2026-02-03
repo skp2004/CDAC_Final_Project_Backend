@@ -18,6 +18,4 @@ public interface BookingService {
 	void cancelBooking(Long bookingId);
 
 	BookingResponseDTO updateBookingStatus(Long bookingId, String status);
-
-	BookingResponseDTO updateRazorpayOrderId(Long bookingId, String razorpayOrderId);
 }

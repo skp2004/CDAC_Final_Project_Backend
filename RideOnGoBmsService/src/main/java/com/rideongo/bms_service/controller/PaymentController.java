@@ -40,9 +40,16 @@ public class PaymentController {
 				HttpStatus.CREATED);
 	}
 
-	@GetMapping
-	public ResponseEntity<List<PaymentResponseDTO>> getAllPayments() {
-		return ResponseEntity.ok(paymentService.getAllPayments());
+	@PostMapping("/create-order")
+	public ResponseEntity<com.rideongo.bms_service.dtos.OrderResponseDTO> createOrder(
+			@RequestBody com.rideongo.bms_service.dtos.OrderRequestDTO dto) {
+		return ResponseEntity.ok(paymentService.createOrder(dto));
+	}
+
+	@PostMapping("/verify")
+	public ResponseEntity<PaymentResponseDTO> verifyPayment(
+			@RequestBody com.rideongo.bms_service.dtos.PaymentVerifyDTO dto) {
+		return ResponseEntity.ok(paymentService.verifyPayment(dto));
 	}
 
 	@GetMapping("/booking/{bookingId}")
@@ -52,18 +59,9 @@ public class PaymentController {
 		return ResponseEntity.ok(paymentService.getPaymentsByBooking(bookingId));
 	}
 
-	@PostMapping("/create-order")
-	public ResponseEntity<RazorpayOrderResponse> createRazorpayOrder(
-			@RequestBody @Valid RazorpayOrderRequest request) {
-
-		return ResponseEntity.ok(paymentService.createRazorpayOrder(request));
-	}
-
-	@PostMapping("/verify")
-	public ResponseEntity<PaymentResponseDTO> verifyPayment(
-			@RequestBody @Valid RazorpayPaymentVerification request) {
-
-		return ResponseEntity.ok(paymentService.verifyAndSavePayment(request));
+	@GetMapping
+	public ResponseEntity<List<PaymentResponseDTO>> getAllPayments() {
+		return ResponseEntity.ok(paymentService.getAllPayments());
 	}
 
 	@DeleteMapping("/{paymentId}")

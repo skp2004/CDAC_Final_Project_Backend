@@ -56,6 +56,7 @@ public class SecurityConfig {
                     .pathMatchers(HttpMethod.GET, "/bms/bookings/**")
                     .hasAnyRole("CUSTOMER", "ADMIN")
                     .pathMatchers(HttpMethod.GET, "/bms/locations").permitAll()   
+                    .pathMatchers(HttpMethod.GET, "/bms/bikes/location/**").permitAll()   
                     .pathMatchers(HttpMethod.POST, "/bms/bookings")
                     .hasAnyRole("CUSTOMER", "ADMIN")
  
@@ -65,6 +66,8 @@ public class SecurityConfig {
                     // Admin-only endpoints
                     .pathMatchers(HttpMethod.GET, "/ums/users").hasRole("ADMIN")
                     .pathMatchers(HttpMethod.POST, "/ums/users/admin/signin").permitAll()
+                    .pathMatchers(HttpMethod.GET,"/bms/reviews").hasAnyRole("CUSTOMER","ADMIN")
+                    .pathMatchers(HttpMethod.POST,"/bms/payments/create-order").hasAnyRole("CUSTOMER","ADMIN")
                     .pathMatchers(HttpMethod.GET,"/bms/**").hasRole("ADMIN")
                   
                      // For review endpoints
