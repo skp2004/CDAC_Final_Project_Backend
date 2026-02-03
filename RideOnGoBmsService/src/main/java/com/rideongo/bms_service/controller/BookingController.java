@@ -73,11 +73,11 @@ public class BookingController {
 		return ResponseEntity.ok("Booking cancelled successfully");
 	}
 
-	@org.springframework.web.bind.annotation.PutMapping("/{bookingId}/status")
-	public ResponseEntity<BookingResponseDTO> updateBookingStatus(
-			@PathVariable Long bookingId,
-			@org.springframework.web.bind.annotation.RequestParam String status) {
-
-		return ResponseEntity.ok(bookingService.updateBookingStatus(bookingId, status));
-	}
+//	@org.springframework.web.bind.annotation.PutMapping("/{bookingId}/status")
+//	public ResponseEntity<BookingResponseDTO> updateBookingStatus(
+//			@PathVariable Long bookingId,
+//			@org.springframework.web.bind.annotation.RequestParam String status) {
+//
+//		return ResponseEntity.ok(bookingService.updateBookingStatus(bookingId, status));
+//	}
 }
