@@ -12,6 +12,7 @@ import com.rideongo.bms_service.dtos.BookingResponseDTO;
 import com.rideongo.bms_service.entities.*;
 import com.rideongo.bms_service.repository.BikeRepository;
 import com.rideongo.bms_service.repository.BookingRepository;
+import com.rideongo.bms_service.repository.LocationRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +23,7 @@ public class BookingServiceImpl implements BookingService {
 
 	private final BookingRepository bookingRepository;
 	private final BikeRepository bikeRepository;
+	private final LocationRepository locationRepository;
 
 	@Override
 	public BookingResponseDTO createBooking(BookingRequestDTO dto) {
@@ -35,6 +37,21 @@ public class BookingServiceImpl implements BookingService {
 		booking.setPickupTs(dto.getPickupTs());
 		booking.setDropTs(dto.getDropTs());
 		booking.setRentalType(RentalType.valueOf(dto.getRentalType().toUpperCase()));
+
+		// Handle pickup type and location/address
+		PickupType pickupType = PickupType.valueOf(dto.getPickupType().toUpperCase());
+		booking.setPickupType(pickupType);
+
+		if (pickupType == PickupType.STATION && dto.getPickupLocationId() != null) {
+			Location location = locationRepository.findById(dto.getPickupLocationId())
+					.orElseThrow(() -> new ResourceNotFoundException("Pickup location not found"));
+			booking.setPickupLocation(location);
+		}
+
+		if (pickupType == PickupType.DOORSTEP && dto.getDeliveryAddress() != null) {
+			booking.setDeliveryAddress(dto.getDeliveryAddress());
+		}
+
 		booking.setTaxAmount(dto.getTaxAmount());
 		booking.setDiscountAmount(dto.getDiscountAmount());
 		booking.setTotalAmount(dto.getTotalAmount());
@@ -79,22 +96,63 @@ public class BookingServiceImpl implements BookingService {
 				.orElseThrow(() -> new BookingNotFoundException("Booking not found"));
 
 		booking.setBookingStatus(BookingStatus.CANCELLED);
-		booking.setIsDeleted(true);
 		bookingRepository.save(booking);
 	}
 
+	@Override
+	public BookingResponseDTO updateBookingStatus(Long bookingId, String status) {
+		Booking booking = bookingRepository.findByIdAndIsDeletedFalse(bookingId)
+				.orElseThrow(() -> new BookingNotFoundException("Booking not found"));
+
+		try {
+			booking.setBookingStatus(BookingStatus.valueOf(status.toUpperCase()));
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException("Invalid booking status: " + status);
+		}
+
+		Booking saved = bookingRepository.save(booking);
+
+		return mapToResponse(saved);
+	}
+
 	private BookingResponseDTO mapToResponse(Booking booking) {
-		return new BookingResponseDTO(
-				booking.getId(),
-				booking.getBike().getId(),
-				booking.getUserId(),
-				booking.getPickupTs(),
-				booking.getDropTs(),
-				booking.getRentalType().name(),
-				booking.getTaxAmount(),
-				booking.getDiscountAmount(),
-				booking.getTotalAmount(),
-				booking.getBookingStatus().name()
-		);
+		Bike bike = booking.getBike();
+		String bikeName = bike.getBrand().getBrandName() + " " + bike.getCategory().name();
+
+		BookingResponseDTO dto = new BookingResponseDTO();
+		dto.setBookingId(booking.getId());
+		dto.setBikeId(bike.getId());
+		dto.setUserId(booking.getUserId());
+		dto.setPickupTs(booking.getPickupTs());
+		dto.setDropTs(booking.getDropTs());
+		dto.setRentalType(booking.getRentalType().name());
+		dto.setTaxAmount(booking.getTaxAmount());
+		dto.setDiscountAmount(booking.getDiscountAmount());
+		dto.setTotalAmount(booking.getTotalAmount());
+		dto.setBookingStatus(booking.getBookingStatus().name());
+
+		// Bike info
+		dto.setBikeName(bikeName);
+		dto.setBikeImage(bike.getImage());
+
+		// Pickup type
+		dto.setPickupType(booking.getPickupType() != null ? booking.getPickupType().name() : "STATION");
+		dto.setCreatedAt(booking.getCreatedAt());
+
+		// Location details for STATION pickup
+		Location location = booking.getPickupLocation();
+		if (location != null) {
+			dto.setPickupLocationId(location.getId());
+			dto.setPickupLocationAddress(location.getAddress());
+			dto.setPickupLocationCity(location.getCity());
+			dto.setPickupLocationState(location.getState());
+			dto.setPickupLocationPincode(location.getPincode());
+			dto.setPickupLocationContact(location.getContactNumber());
+		}
+
+		// Delivery address for DOORSTEP
+		dto.setDeliveryAddress(booking.getDeliveryAddress());
+
+		return dto;
 	}
 }

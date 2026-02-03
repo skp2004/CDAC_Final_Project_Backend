@@ -26,6 +26,16 @@ public class BookingRequestDTO {
 	@NotNull
 	private String rentalType;
 
+	// Pickup Type: STATION or DOORSTEP
+	@NotNull
+	private String pickupType;
+
+	// For STATION pickup - location ID
+	private Long pickupLocationId;
+
+	// For DOORSTEP delivery - address
+	private String deliveryAddress;
+
 	@NotNull
 	@Min(0)
 	private Double taxAmount;

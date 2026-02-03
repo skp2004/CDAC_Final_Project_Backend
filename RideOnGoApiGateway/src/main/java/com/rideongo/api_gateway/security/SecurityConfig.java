@@ -47,42 +47,48 @@ public class SecurityConfig {
                     .pathMatchers(HttpMethod.OPTIONS).permitAll()
                     
                     // Public endpoints
-                    .pathMatchers(HttpMethod.POST, "/users/signin").permitAll()
-                    .pathMatchers(HttpMethod.POST, "/users/signup").permitAll()
-                    .pathMatchers(HttpMethod.POST, "/users/register").permitAll()
+                    .pathMatchers(HttpMethod.POST, "/ums/users/signin").permitAll()
+                    .pathMatchers(HttpMethod.POST, "/ums/users/signup").permitAll()
+                    .pathMatchers(HttpMethod.POST, "/ums/users/register").permitAll()	
                     
                     .pathMatchers(HttpMethod.GET, "/bms/bikes")
                     .permitAll() 
+                    .pathMatchers(HttpMethod.GET, "/bms/bookings/**")
+                    .hasAnyRole("CUSTOMER", "ADMIN")
+                    .pathMatchers(HttpMethod.GET, "/bms/locations").permitAll()   
+                    .pathMatchers(HttpMethod.GET, "/bms/bikes/location/**").permitAll()   
+                    .pathMatchers(HttpMethod.POST, "/bms/bookings")
+                    .hasAnyRole("CUSTOMER", "ADMIN")
+ 
                     // To get bike in a city and city,id in all endpoints 
                     .pathMatchers(HttpMethod.GET, "/bms/locations/cities").permitAll()   
                     .pathMatchers(HttpMethod.GET, "/bms/locations/city/*/bikes").permitAll()
                     // Admin-only endpoints
-                    .pathMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
-                    .pathMatchers(HttpMethod.POST, "/users/admin/signin").permitAll()
+                    .pathMatchers(HttpMethod.GET, "/ums/users").hasRole("ADMIN")
+                    .pathMatchers(HttpMethod.POST, "/ums/users/admin/signin").permitAll()
+                    .pathMatchers(HttpMethod.GET,"/bms/reviews").hasAnyRole("CUSTOMER","ADMIN")
+                    .pathMatchers(HttpMethod.POST,"/bms/payments/create-order").hasAnyRole("CUSTOMER","ADMIN")
                     .pathMatchers(HttpMethod.GET,"/bms/**").hasRole("ADMIN")
                   
                      // For review endpoints
                     .pathMatchers(HttpMethod.POST,"/bms/reviews").hasRole("CUSTOMER")
 
                     // UMS: Self-service APIs (ALL authenticated roles)
-                    .pathMatchers(HttpMethod.PUT, "/users/me").authenticated()
+                    .pathMatchers(HttpMethod.PUT, "/ums/users/me").authenticated()
                     .pathMatchers(HttpMethod.PATCH, "/users/me/password").authenticated()
 
                     //  UMS: Admin-only ID based updates
-                    .pathMatchers(HttpMethod.PUT, "/users/*").hasRole("ADMIN")
-                    .pathMatchers(HttpMethod.PATCH, "/users/*/password").hasRole("ADMIN")
+                    .pathMatchers(HttpMethod.PUT, "/ums/users/*").hasRole("ADMIN")
+                    .pathMatchers(HttpMethod.PATCH, "/ums/users/*/password").hasRole("ADMIN")
 
                     //  BMS: All other BMS APIs → ADMIN only
                     .pathMatchers("/bms/**")
-                        .hasRole("ADMIN")             
+                    .hasAnyRole("CUSTOMER", "ADMIN")           
 
                     // Admin-only endpoints
-                    .pathMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
+                    .pathMatchers(HttpMethod.GET, "/ums/users").hasRole("ADMIN")
                     
-                    // Doctor-only endpoints
-                    .pathMatchers(HttpMethod.POST, "/appointments/mark-complete-with-tests")
-                        .hasRole("DOCTOR")
-                    
+                                
                     // All other requests need authentication
                     .anyExchange().authenticated()
                 )

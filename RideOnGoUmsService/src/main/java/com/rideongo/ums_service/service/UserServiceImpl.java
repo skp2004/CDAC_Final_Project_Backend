@@ -34,8 +34,8 @@ import com.rideongo.ums_service.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Service 
-@Transactional 
+@Service
+@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
@@ -46,11 +46,12 @@ public class UserServiceImpl implements UserService {
 	private final AuthenticationManager authenticationManager;
 	private final JwtUtils jwtUtils;
 	private final CloudinaryService cloudinaryService;
+
 	@Override
 	public List<UserDTO> getAllUsers() {
 
-		return userRepository.findAll() 
-				.stream() 
+		return userRepository.findAll()
+				.stream()
 				.map(entity -> modelMapper.map(entity, UserDTO.class))
 				.toList();
 	}
@@ -84,89 +85,78 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User getUserDetails(Long userId) {
 
-		return userRepository.findById(userId) 
+		return userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Invalid user id !!!!!"));
 	}
 
 	@Override
 	public ApiResponse updateDetails(Long id, UpdateUserRequestDTO dto) {
 
-	    User user = getUserDetails(id);
+		User user = getUserDetails(id);
 
-	    user.setFirstName(dto.getFirstName());
-	    user.setLastName(dto.getLastName());
-	    user.setDob(dto.getDob());
-	    user.setPhone(dto.getPhone());
+		user.setFirstName(dto.getFirstName());
+		user.setLastName(dto.getLastName());
+		user.setDob(dto.getDob());
+		user.setPhone(dto.getPhone());
 
-	    return new ApiResponse("SUCCESS", "User details updated successfully");
+		return new ApiResponse("SUCCESS", "User details updated successfully");
 	}
+
 	@Override
 	public ApiResponse updateUserByEmail(String email, UpdateUserRequestDTO dto) {
 
-	    User user = userRepository.findByEmail(email)
-	            .orElseThrow(() ->
-	                new ResourceNotFoundException("User not found"));
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-	    user.setFirstName(dto.getFirstName());
-	    user.setLastName(dto.getLastName());
-	    user.setPhone(dto.getPhone());
-	    user.setDob(dto.getDob());
+		user.setFirstName(dto.getFirstName());
+		user.setLastName(dto.getLastName());
+		user.setPhone(dto.getPhone());
+		user.setDob(dto.getDob());
 
-	    return new ApiResponse("SUCCESS", "Profile updated successfully");
+		return new ApiResponse("SUCCESS", "Profile updated successfully");
 	}
-
 
 	@Override
 	public ApiResponse updatePassword(Long userId, AdminResetPasswordDTO dto) {
 
-	    User user = userRepository.findById(userId)
-	            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-	    // 🚫 NO OLD PASSWORD CHECK FOR ADMIN
+		// 🚫 NO OLD PASSWORD CHECK FOR ADMIN
 
-	    user.setPassword(
-	            passwordEncoder.encode(dto.getNewPassword())
-	    );
+		user.setPassword(
+				passwordEncoder.encode(dto.getNewPassword()));
 
-	    return new ApiResponse(
-	            "SUCCESS",
-	            "Password reset successfully by admin"
-	    );
+		return new ApiResponse(
+				"SUCCESS",
+				"Password reset successfully by admin");
 	}
 
-	
 	@Override
 	public ApiResponse updatePasswordByEmail(String email, UpdatePasswordDTO dto) {
 
-	    // 1. Fetch user using email from JWT
-	    User user = userRepository.findByEmail(email)
-	            .orElseThrow(() ->
-	                new ResourceNotFoundException("User not found"));
+		// 1. Fetch user using email from JWT
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-	    // 2. Validate old password
-	    if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
-	        throw new InvalidInputException("Old password is incorrect");
-	    }
+		// 2. Validate old password
+		if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+			throw new InvalidInputException("Old password is incorrect");
+		}
 
-	    // 3. Prevent same password reuse
-	    if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) {
-	        throw new InvalidInputException("New password must be different from old password");
-	    }
+		// 3. Prevent same password reuse
+		if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) {
+			throw new InvalidInputException("New password must be different from old password");
+		}
 
-	    // 4. Encode & update password
-	    user.setPassword(
-	            passwordEncoder.encode(dto.getNewPassword())
-	    );
+		// 4. Encode & update password
+		user.setPassword(
+				passwordEncoder.encode(dto.getNewPassword()));
 
-	    
-
-	    return new ApiResponse(
-	            "SUCCESS",
-	            "Password updated successfully"
-	    );
+		return new ApiResponse(
+				"SUCCESS",
+				"Password updated successfully");
 	}
-
-
 
 	@Override
 	public AuthResp authenticate(AuthRequest request) {
@@ -174,66 +164,67 @@ public class UserServiceImpl implements UserService {
 
 		Authentication holder = new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
 		log.info("*****Before -  is authenticated {}", holder.isAuthenticated());// false
-	
+
 		Authentication fullyAuth = authenticationManager.authenticate(holder);
-		
+
 		log.info("*****After -  is authenticated {}", fullyAuth.isAuthenticated());// true
 		log.info("**** auth {} ", fullyAuth);// principal : user details , null : pwd , Collection<GrantedAuth>
 		log.info("***** class of principal {}", fullyAuth.getPrincipal().getClass());// com.healthcare.security.UserPrincipal
-	
+
 		UserPrincipal principal = (UserPrincipal) fullyAuth.getPrincipal();
 		return new AuthResp(jwtUtils.generateToken(principal), "Successful Login");
 
 	}
+
 	@Override
 	public AuthResp authenticateAdmin(AuthRequest request) {
-	    System.out.println("in admin sign in " + request);
+		System.out.println("in admin sign in " + request);
 
-	    // Create authentication token
-	    Authentication holder = new UsernamePasswordAuthenticationToken(
-	        request.getEmail(), 
-	        request.getPassword()
-	    );
-	    log.info("***** Before - is authenticated {}", holder.isAuthenticated());
+		// Create authentication token
+		Authentication holder = new UsernamePasswordAuthenticationToken(
+				request.getEmail(),
+				request.getPassword());
+		log.info("***** Before - is authenticated {}", holder.isAuthenticated());
 
-	    // Authenticate user credentials
-	    Authentication fullyAuth = authenticationManager.authenticate(holder);
+		// Authenticate user credentials
+		Authentication fullyAuth = authenticationManager.authenticate(holder);
 
-	    log.info("***** After - is authenticated {}", fullyAuth.isAuthenticated());
-	    log.info("**** auth {}", fullyAuth);
+		log.info("***** After - is authenticated {}", fullyAuth.isAuthenticated());
+		log.info("**** auth {}", fullyAuth);
 
-	    // Get the authenticated user principal
-	    UserPrincipal principal = (UserPrincipal) fullyAuth.getPrincipal();
-	    
-	    // Check if user has ADMIN role
-	    boolean isAdmin = principal.getAuthorities().stream()
-	        .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-	    
-	    if (!isAdmin) {
-	        log.warn("***** Non-admin user attempted admin login: {}", request.getEmail());
-	        throw new UnauthorizedException("Access denied. Admin privileges required.");
-	    }
+		// Get the authenticated user principal
+		UserPrincipal principal = (UserPrincipal) fullyAuth.getPrincipal();
 
-	    log.info("***** Admin login successful for: {}", request.getEmail());
-	    return new AuthResp(jwtUtils.generateToken(principal), "Admin Login Successful");
+		// Check if user has ADMIN role
+		boolean isAdmin = principal.getAuthorities().stream()
+				.anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+		if (!isAdmin) {
+			log.warn("***** Non-admin user attempted admin login: {}", request.getEmail());
+			throw new UnauthorizedException("Access denied. Admin privileges required.");
+		}
+
+		log.info("***** Admin login successful for: {}", request.getEmail());
+		return new AuthResp(jwtUtils.generateToken(principal), "Admin Login Successful");
 	}
+
 	@Override
 	public ApiResponse encryptPasswords() {
-		
+
 		List<User> users = userRepository.findAll();
-		
+
 		users.forEach(user -> user.setPassword(passwordEncoder.encode(user.getPassword())));
 		return new ApiResponse("Password encrypted", "Success");
 	}
 
 	@Override
-	public ApiResponse userSignup(UserSignupRequest request, 
-	                               MultipartFile profileImage, 
-	                               MultipartFile aadhaarImage, 
-	                               MultipartFile licenseImage) throws IOException {
-		
+	public ApiResponse userSignup(UserSignupRequest request,
+			MultipartFile profileImage,
+			MultipartFile aadhaarImage,
+			MultipartFile licenseImage) throws IOException {
+
 		log.info("Processing customer signup for email: {}", request.getEmail());
-		
+
 		if (userRepository.existsByEmailOrPhone(request.getEmail(), request.getPhone())) {
 			throw new InvalidInputException("Email or phone already exists");
 		}
@@ -249,36 +240,33 @@ public class UserServiceImpl implements UserService {
 		try {
 			if (profileImage != null && !profileImage.isEmpty()) {
 				String profileImageUrl = cloudinaryService.uploadImage(
-						profileImage, 
-						"rideongo/users/profiles"
-				);
+						profileImage,
+						"rideongo/users/profiles");
 				user.setImage(profileImageUrl);
 				log.info("Profile image uploaded successfully");
 			}
 
 			if (aadhaarImage != null && !aadhaarImage.isEmpty()) {
 				String aadhaarUrl = cloudinaryService.uploadImage(
-						aadhaarImage, 
-						"rideongo/users/aadhaar"
-				);
+						aadhaarImage,
+						"rideongo/users/aadhaar");
 				user.setAadhaarUrl(aadhaarUrl);
 				log.info("Aadhaar image uploaded successfully");
 			}
 
 			if (licenseImage != null && !licenseImage.isEmpty()) {
 				String licenseUrl = cloudinaryService.uploadImage(
-						licenseImage, 
-						"rideongo/users/licenses"
-				);
+						licenseImage,
+						"rideongo/users/licenses");
 				user.setLicenceUrl(licenseUrl);
 				log.info("License image uploaded successfully");
 			}
 
 			userRepository.save(user);
 			log.info("Customer registered successfully with ID: {}", user.getId());
-			
+
 			return new ApiResponse("SUCCESS", "Customer registered successfully");
-			
+
 		} catch (IOException e) {
 			log.error("Error uploading images during customer signup", e);
 			throw new IOException("Failed to upload images: " + e.getMessage());
@@ -286,11 +274,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ApiResponse adminSignup(AdminSignupRequest request, 
-	                                MultipartFile profileImage) throws IOException {
-		
+	public ApiResponse adminSignup(AdminSignupRequest request,
+			MultipartFile profileImage) throws IOException {
+
 		log.info("Processing admin signup for email: {}", request.getEmail());
-		
+
 		if (userRepository.existsByEmail(request.getEmail())) {
 			throw new InvalidInputException("Admin email already exists");
 		}
@@ -309,24 +297,23 @@ public class UserServiceImpl implements UserService {
 		try {
 			if (profileImage != null && !profileImage.isEmpty()) {
 				String profileImageUrl = cloudinaryService.uploadImage(
-						profileImage, 
-						"rideongo/admins/profiles"
-				);
+						profileImage,
+						"rideongo/admins/profiles");
 				admin.setImage(profileImageUrl);
 				log.info("Admin profile image uploaded successfully");
 			}
 
 			userRepository.save(admin);
 			log.info("Admin registered successfully with ID: {}", admin.getId());
-			
+
 			return new ApiResponse("SUCCESS", "Admin registered successfully");
-			
+
 		} catch (IOException e) {
 			log.error("Error uploading profile image during admin signup", e);
 			throw new IOException("Failed to upload profile image: " + e.getMessage());
 		}
 	}
-	
+
 	@Override
 	public UserProfileResponseDTO getLoggedInUserProfile(String email) {
 
@@ -336,5 +323,61 @@ public class UserServiceImpl implements UserService {
 		return modelMapper.map(user, UserProfileResponseDTO.class);
 	}
 
+	@Override
+	public ApiResponse verifyUser(Long userId) {
+		log.info("Verifying user with ID: {}", userId);
+
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+		// Check if user is a customer (only customers need verification)
+		if (user.getUserRole() != UserRole.ROLE_CUSTOMER) {
+			throw new InvalidInputException("Only customer users can be verified");
+		}
+
+		// Check if both documents are uploaded
+		if (user.getAadhaarUrl() == null || user.getAadhaarUrl().isEmpty()) {
+			throw new InvalidInputException("Cannot verify user: Aadhaar document not uploaded");
+		}
+
+		if (user.getLicenceUrl() == null || user.getLicenceUrl().isEmpty()) {
+			throw new InvalidInputException("Cannot verify user: Driving License document not uploaded");
+		}
+
+		// Check if already verified
+		if (user.isVerified()) {
+			throw new InvalidInputException("User is already verified");
+		}
+
+		user.setVerified(true);
+		user.setKycStatus("VERIFIED");
+
+		log.info("User verified successfully: {}", userId);
+		return new ApiResponse("SUCCESS", "User verified successfully");
+	}
+
+	@Override
+	public ApiResponse unverifyUser(Long userId) {
+		log.info("Unverifying user with ID: {}", userId);
+
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+		// Check if user is a customer
+		if (user.getUserRole() != UserRole.ROLE_CUSTOMER) {
+			throw new InvalidInputException("Only customer users can be unverified");
+		}
+
+		// Check if not verified
+		if (!user.isVerified()) {
+			throw new InvalidInputException("User is already unverified");
+		}
+
+		user.setVerified(false);
+		user.setKycStatus("PENDING");
+
+		log.info("User unverified successfully: {}", userId);
+		return new ApiResponse("SUCCESS", "User unverified successfully");
+	}
 
 }

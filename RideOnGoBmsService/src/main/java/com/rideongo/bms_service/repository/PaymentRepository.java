@@ -11,4 +11,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 	boolean existsByTxnRef(String txnRef);
 
 	List<Payment> findByBookingIdAndIsDeletedFalse(Long bookingId);
+
+	List<Payment> findByIsDeletedFalse();
 }

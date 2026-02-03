@@ -18,7 +18,7 @@ import com.rideongo.ums_service.dtos.UserSignupRequest;
 import com.rideongo.ums_service.entities.User;
 
 public interface UserService {
-//get all users
+	// get all users
 	List<UserDTO> getAllUsers();
 
 	String addUser(User user);
@@ -28,22 +28,30 @@ public interface UserService {
 	User getUserDetails(Long userId);
 
 	ApiResponse updateDetails(Long id, UpdateUserRequestDTO dto);
+
 	ApiResponse updateUserByEmail(String email, UpdateUserRequestDTO dto);
+
 	ApiResponse updatePasswordByEmail(String email, UpdatePasswordDTO dto);
 
-
 	AuthResp authenticate(AuthRequest request);
+
 	AuthResp authenticateAdmin(AuthRequest request);
+
 	ApiResponse updatePassword(Long userId, AdminResetPasswordDTO dto);
+
 	ApiResponse encryptPasswords();
 
-	ApiResponse userSignup(UserSignupRequest request, 
-	                       MultipartFile profileImage, 
-	                       MultipartFile aadhaarImage, 
-	                       MultipartFile licenseImage) throws IOException;
-	
-	ApiResponse adminSignup(AdminSignupRequest request, 
-	                        MultipartFile profileImage) throws IOException;
-	
+	ApiResponse userSignup(UserSignupRequest request,
+			MultipartFile profileImage,
+			MultipartFile aadhaarImage,
+			MultipartFile licenseImage) throws IOException;
+
+	ApiResponse adminSignup(AdminSignupRequest request,
+			MultipartFile profileImage) throws IOException;
+
 	UserProfileResponseDTO getLoggedInUserProfile(String email);
+
+	ApiResponse verifyUser(Long userId);
+
+	ApiResponse unverifyUser(Long userId);
 }

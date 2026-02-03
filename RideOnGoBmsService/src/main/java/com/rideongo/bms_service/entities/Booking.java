@@ -1,4 +1,4 @@
- package com.rideongo.bms_service.entities;
+package com.rideongo.bms_service.entities;
 
 import java.time.LocalDateTime;
 
@@ -40,6 +40,20 @@ public class Booking extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "rental_type", length = 20, nullable = false)
 	private RentalType rentalType;
+
+	// Pickup Type: STATION or DOORSTEP
+	@Enumerated(EnumType.STRING)
+	@Column(name = "pickup_type", length = 20, nullable = false)
+	private PickupType pickupType = PickupType.STATION;
+
+	// For STATION pickup - reference to location
+	@ManyToOne
+	@JoinColumn(name = "pickup_location_id")
+	private Location pickupLocation;
+
+	// For DOORSTEP delivery - customer's address
+	@Column(name = "delivery_address", length = 500)
+	private String deliveryAddress;
 
 	@Column(name = "tax_amount", nullable = false)
 	private Double taxAmount;

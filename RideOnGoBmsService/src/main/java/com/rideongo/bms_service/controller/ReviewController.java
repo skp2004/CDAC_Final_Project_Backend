@@ -20,6 +20,7 @@ import com.rideongo.bms_service.service.ReviewService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
@@ -28,33 +29,28 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping 
+    @PostMapping
     public ResponseEntity<ReviewResponseDTO> addReview(
             @RequestBody @Valid ReviewRequestDTO dto,
-            @RequestHeader("Authorization") String authHeader 
-    ) {
+            @RequestHeader("Authorization") String authHeader) {
         return ResponseEntity.ok(
-            reviewService.addReview(dto, authHeader) 
-        );
+                reviewService.addReview(dto, authHeader));
     }
 
-    @PutMapping("/{reviewId}") 
+    @PutMapping("/{reviewId}")
     public ResponseEntity<ReviewResponseDTO> updateReview(
             @PathVariable Long reviewId,
             @RequestBody @Valid ReviewRequestDTO dto,
-            @RequestHeader("Authorization") String authHeader 
-    ) {
+            @RequestHeader("Authorization") String authHeader) {
         return ResponseEntity.ok(
-            reviewService.updateReview(reviewId, dto, authHeader) 
-        );
+                reviewService.updateReview(reviewId, dto, authHeader));
     }
 
-    @DeleteMapping("/{reviewId}") 
+    @DeleteMapping("/{reviewId}")
     public ResponseEntity<String> deleteReview(
             @PathVariable Long reviewId,
-            @RequestHeader("Authorization") String authHeader 
-    ) {
-        reviewService.softDeleteReview(reviewId, authHeader); 
+            @RequestHeader("Authorization") String authHeader) {
+        reviewService.softDeleteReview(reviewId, authHeader);
         return ResponseEntity.ok("Review deleted successfully");
     }
 
@@ -62,5 +58,10 @@ public class ReviewController {
     public ResponseEntity<List<ReviewResponseDTO>> getReviewsByBike(
             @PathVariable Long bikeId) {
         return ResponseEntity.ok(reviewService.getReviewsByBike(bikeId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ReviewResponseDTO>> getAllReviews() {
+        return ResponseEntity.ok(reviewService.getAllReviews());
     }
 }

@@ -9,7 +9,14 @@ public interface PaymentService {
 
 	PaymentResponseDTO makePayment(PaymentRequestDTO dto);
 
+	// Razorpay specific
+	com.rideongo.bms_service.dtos.OrderResponseDTO createOrder(com.rideongo.bms_service.dtos.OrderRequestDTO dto);
+
+	PaymentResponseDTO verifyPayment(com.rideongo.bms_service.dtos.PaymentVerifyDTO dto);
+
 	List<PaymentResponseDTO> getPaymentsByBooking(Long bookingId);
+
+	List<PaymentResponseDTO> getAllPayments();
 
 	void softDeletePayment(Long paymentId);
 }

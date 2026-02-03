@@ -34,8 +34,19 @@ public class PaymentController {
 
 		return new ResponseEntity<>(
 				paymentService.makePayment(dto),
-				HttpStatus.CREATED
-		);
+				HttpStatus.CREATED);
+	}
+
+	@PostMapping("/create-order")
+	public ResponseEntity<com.rideongo.bms_service.dtos.OrderResponseDTO> createOrder(
+			@RequestBody com.rideongo.bms_service.dtos.OrderRequestDTO dto) {
+		return ResponseEntity.ok(paymentService.createOrder(dto));
+	}
+
+	@PostMapping("/verify")
+	public ResponseEntity<PaymentResponseDTO> verifyPayment(
+			@RequestBody com.rideongo.bms_service.dtos.PaymentVerifyDTO dto) {
+		return ResponseEntity.ok(paymentService.verifyPayment(dto));
 	}
 
 	@GetMapping("/booking/{bookingId}")
@@ -43,6 +54,11 @@ public class PaymentController {
 			@PathVariable Long bookingId) {
 
 		return ResponseEntity.ok(paymentService.getPaymentsByBooking(bookingId));
+	}
+
+	@GetMapping
+	public ResponseEntity<List<PaymentResponseDTO>> getAllPayments() {
+		return ResponseEntity.ok(paymentService.getAllPayments());
 	}
 
 	@DeleteMapping("/{paymentId}")
