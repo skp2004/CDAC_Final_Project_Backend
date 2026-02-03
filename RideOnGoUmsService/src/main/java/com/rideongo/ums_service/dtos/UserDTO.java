@@ -14,7 +14,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserDTO {
-	private Long id;	
+	private Long id;
 	private String firstName;
 	private String lastName;
 	private LocalDate dob;
@@ -22,5 +22,7 @@ public class UserDTO {
 	private String phone;
 	private String image;
 	private boolean isVerified;
-	
+	private String aadhaarUrl;
+	private String licenceUrl;
+
 }

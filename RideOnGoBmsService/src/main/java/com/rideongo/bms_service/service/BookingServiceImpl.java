@@ -37,14 +37,18 @@ public class BookingServiceImpl implements BookingService {
 		booking.setPickupTs(dto.getPickupTs());
 		booking.setDropTs(dto.getDropTs());
 		booking.setRentalType(RentalType.valueOf(dto.getRentalType().toUpperCase()));
-		booking.setPickupType(PickupType.valueOf(dto.getPickupType().toUpperCase()));
 
-		// Handle pickup location or delivery address based on pickup type
-		if (booking.getPickupType() == PickupType.STATION && dto.getPickupLocationId() != null) {
-			Location pickupLocation = locationRepository.findById(dto.getPickupLocationId())
+		// Handle pickup type and location/address
+		PickupType pickupType = PickupType.valueOf(dto.getPickupType().toUpperCase());
+		booking.setPickupType(pickupType);
+
+		if (pickupType == PickupType.STATION && dto.getPickupLocationId() != null) {
+			Location location = locationRepository.findById(dto.getPickupLocationId())
 					.orElseThrow(() -> new ResourceNotFoundException("Pickup location not found"));
-			booking.setPickupLocation(pickupLocation);
-		} else if (booking.getPickupType() == PickupType.DOORSTEP) {
+			booking.setPickupLocation(location);
+		}
+
+		if (pickupType == PickupType.DOORSTEP && dto.getDeliveryAddress() != null) {
 			booking.setDeliveryAddress(dto.getDeliveryAddress());
 		}
 
@@ -92,56 +96,63 @@ public class BookingServiceImpl implements BookingService {
 				.orElseThrow(() -> new BookingNotFoundException("Booking not found"));
 
 		booking.setBookingStatus(BookingStatus.CANCELLED);
-		booking.setIsDeleted(true);
 		bookingRepository.save(booking);
 	}
 
 	@Override
 	public BookingResponseDTO updateBookingStatus(Long bookingId, String status) {
-
 		Booking booking = bookingRepository.findByIdAndIsDeletedFalse(bookingId)
 				.orElseThrow(() -> new BookingNotFoundException("Booking not found"));
 
-		booking.setBookingStatus(BookingStatus.valueOf(status.toUpperCase()));
-		Booking saved = bookingRepository.save(booking);
+		try {
+			booking.setBookingStatus(BookingStatus.valueOf(status.toUpperCase()));
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException("Invalid booking status: " + status);
+		}
 
-		return mapToResponse(saved);
-	}
-
-	@Override
-	public BookingResponseDTO updateRazorpayOrderId(Long bookingId, String razorpayOrderId) {
-
-		Booking booking = bookingRepository.findByIdAndIsDeletedFalse(bookingId)
-				.orElseThrow(() -> new BookingNotFoundException("Booking not found"));
-
-		booking.setRazorpayOrderId(razorpayOrderId);
 		Booking saved = bookingRepository.save(booking);
 
 		return mapToResponse(saved);
 	}
 
 	private BookingResponseDTO mapToResponse(Booking booking) {
-		return BookingResponseDTO.builder()
-				.bookingId(booking.getId())
-				.bikeId(booking.getBike().getId())
-				.bikeName(booking.getBike().getBrand().getBrandName())
-				.bikeImage(booking.getBike().getImage())
-				.userId(booking.getUserId())
-				.pickupTs(booking.getPickupTs())
-				.dropTs(booking.getDropTs())
-				.rentalType(booking.getRentalType().name())
-				.pickupType(booking.getPickupType().name())
-				.pickupLocationId(booking.getPickupLocation() != null ? booking.getPickupLocation().getId() : null)
-				.pickupLocationAddress(
-						booking.getPickupLocation() != null ? booking.getPickupLocation().getAddress() : null)
-				.pickupLocationCity(booking.getPickupLocation() != null ? booking.getPickupLocation().getCity() : null)
-				.deliveryAddress(booking.getDeliveryAddress())
-				.taxAmount(booking.getTaxAmount())
-				.discountAmount(booking.getDiscountAmount())
-				.totalAmount(booking.getTotalAmount())
-				.bookingStatus(booking.getBookingStatus().name())
-				.razorpayOrderId(booking.getRazorpayOrderId())
-				.createdAt(booking.getCreatedAt())
-				.build();
+		Bike bike = booking.getBike();
+		String bikeName = bike.getBrand().getBrandName() + " " + bike.getCategory().name();
+
+		BookingResponseDTO dto = new BookingResponseDTO();
+		dto.setBookingId(booking.getId());
+		dto.setBikeId(bike.getId());
+		dto.setUserId(booking.getUserId());
+		dto.setPickupTs(booking.getPickupTs());
+		dto.setDropTs(booking.getDropTs());
+		dto.setRentalType(booking.getRentalType().name());
+		dto.setTaxAmount(booking.getTaxAmount());
+		dto.setDiscountAmount(booking.getDiscountAmount());
+		dto.setTotalAmount(booking.getTotalAmount());
+		dto.setBookingStatus(booking.getBookingStatus().name());
+
+		// Bike info
+		dto.setBikeName(bikeName);
+		dto.setBikeImage(bike.getImage());
+
+		// Pickup type
+		dto.setPickupType(booking.getPickupType() != null ? booking.getPickupType().name() : "STATION");
+		dto.setCreatedAt(booking.getCreatedAt());
+
+		// Location details for STATION pickup
+		Location location = booking.getPickupLocation();
+		if (location != null) {
+			dto.setPickupLocationId(location.getId());
+			dto.setPickupLocationAddress(location.getAddress());
+			dto.setPickupLocationCity(location.getCity());
+			dto.setPickupLocationState(location.getState());
+			dto.setPickupLocationPincode(location.getPincode());
+			dto.setPickupLocationContact(location.getContactNumber());
+		}
+
+		// Delivery address for DOORSTEP
+		dto.setDeliveryAddress(booking.getDeliveryAddress());
+
+		return dto;
 	}
 }
