@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rideongo.bms_service.dtos.PaymentRequestDTO;
 import com.rideongo.bms_service.dtos.PaymentResponseDTO;
+import com.rideongo.bms_service.dtos.RazorpayOrderRequest;
+import com.rideongo.bms_service.dtos.RazorpayOrderResponse;
+import com.rideongo.bms_service.dtos.RazorpayPaymentVerification;
 import com.rideongo.bms_service.service.PaymentService;
 
 import jakarta.validation.Valid;

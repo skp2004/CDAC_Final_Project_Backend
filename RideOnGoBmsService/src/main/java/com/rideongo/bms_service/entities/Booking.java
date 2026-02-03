@@ -67,4 +67,7 @@ public class Booking extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "booking_status", length = 20, nullable = false)
 	private BookingStatus bookingStatus;
+
+	@Column(name = "razorpay_order_id", length = 100)
+	private String razorpayOrderId;
 }
