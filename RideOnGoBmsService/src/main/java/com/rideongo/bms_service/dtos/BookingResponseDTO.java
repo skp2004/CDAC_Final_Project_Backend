@@ -17,7 +17,7 @@ public class BookingResponseDTO {
 	private Long bookingId;
 	private Long bikeId;
 	private String bikeName;
-	private String bikeImage;
+
 	private Long userId;
 	private LocalDateTime pickupTs;
 	private LocalDateTime dropTs;
@@ -33,19 +33,14 @@ public class BookingResponseDTO {
 	private String bookingStatus;
 
 	// Additional fields for frontend display
-	private String bikeName;
+
 	private String bikeImage;
-	private String pickupType; // STATION or DOORSTEP
+
 	private LocalDateTime createdAt;
 
 	// Pickup Location details (for STATION pickup)
-	private Long pickupLocationId;
-	private String pickupLocationAddress;
-	private String pickupLocationCity;
 	private String pickupLocationState;
 	private String pickupLocationPincode;
 	private String pickupLocationContact;
 
-	// Delivery address (for DOORSTEP delivery)
-	private String deliveryAddress;
 }
