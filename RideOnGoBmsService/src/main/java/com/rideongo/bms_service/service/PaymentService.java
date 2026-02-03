@@ -23,7 +23,4 @@ public interface PaymentService {
 
 	void softDeletePayment(Long paymentId);
 
-	RazorpayOrderResponse createRazorpayOrder(RazorpayOrderRequest request);
-
-	PaymentResponseDTO verifyAndSavePayment(RazorpayPaymentVerification request);
 }
